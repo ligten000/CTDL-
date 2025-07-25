@@ -78,4 +78,10 @@ struct DanhSachLop
     int n;
     Lop* lop[Max_lop];
 };
+
+const int MAX_SINHVIEN = 10000;
+struct DanhSachSinhVien {
+    int n;
+    SinhVien ds[MAX_SINHVIEN];
+};
 #endif

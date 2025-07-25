@@ -60,6 +60,8 @@
     "random": "cpp",
     "limits": "cpp",
     "string_view": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "iosfwd": "cpp",
+    "ostream": "cpp"
   }
 }
