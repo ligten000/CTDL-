@@ -11,8 +11,8 @@
 #define PASSWORD "abcdef"
 //const int WHITE=15;
 
-char* Pwd () {
-     char S[40]; int i=0;
+char* Pwd (char S[40]) {
+     int i=0;
      while ((S[i]= getch()) != Enter ) 
      { printf ("%c", '*') ; i++ ; 
      }
@@ -24,8 +24,9 @@ int CheckPwd () {
     int dem =0; 
     for ( dem =1 ; dem <=3 ; dem++)
     { printf( "Password :"); 
-      if (strcmp(Pwd(),PASSWORD) ==0)   return 1;
-      else printf ( "\nPassword sai. Hay nhap lai\n")  ; 
+        char S[40];
+        if (strcmp(Pwd(S),PASSWORD) ==0)   return 1;
+        else printf ( "\nPassword sai. Hay nhap lai\n")  ; 
     }
     return 0;  
 }

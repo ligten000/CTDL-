@@ -9,85 +9,74 @@
 using namespace std;
 
 
-
-void SaveLop(const DanhSachLop& dsLop, const char* filename) {
+void GhiDanhSachSinhVien(nodeSinhVien* head, const char* filename) {
     ofstream out(filename);
-    if (!out.is_open()) {
-        cerr << "Không thể mở file: " << filename << '\n';
-        return;
-    }
-    out << dsLop.n << '\n';
-    for (int i = 0; i < dsLop.n; ++i) 
-        out << dsLop.lop[i]->MALOP << '|'<<dsLop.lop[i]->TENLOP << '\n';
-    
-    out.close();
-}
+    if (!out) return;
 
-void SaveDanhSachSinhVien(const DanhSachSinhVien& dsSV, const char* filename) {
-    ofstream out(filename);
-    if (!out.is_open()) {
-        cerr << "Không thể mở file: " << filename << '\n';
-        return;
+    // Đếm số lượng sinh viên
+    int count = 0;
+    for (nodeSinhVien* p = head; p != NULL; p = p->next) {
+        count++;
     }
-    out << dsSV.n << '\n';
-    for (int i = 0; i < dsSV.n; ++i) {
-        out << dsSV.ds[i].MASV << '|' << dsSV.ds[i].HO << '|' << dsSV.ds[i].TEN << '|' << dsSV.ds[i].PHAI<< '|' <<dsSV.ds[i].Password<<'\n';
-    }
-    out.close();
-}
+    out << count << '\n';
 
-void SaveLop_SinhVien(const DanhSachLop& dsLop, const char* filename) {
-    ofstream out(filename);
-    if (!out.is_open()) {
-        cerr << "Không thể mở file: " << filename << '\n';
-        return;
-    }
-    for (int i = 0; i < dsLop.n; ++i) {
-        nodeSinhvien* p = dsLop.lop[i]->listSV;
-        while (p != nullptr) {
-            out << dsLop.lop[i]->MALOP << " " << p->sv.MASV << '\n';
-            p = p->next;
-        }
-    }
-    out.close();
-}
+    for (nodeSinhVien* p = head; p != NULL; p = p->next) {
+        SinhVien* sv = p->sv;
+        out << sv->MASV << '|' << sv->HO << '|' << sv->TEN << '|' 
+            << sv->PHAI << '|' << sv->Password << '\n';
 
-void SaveDiemVaBaiThi(const DanhSachSinhVien& dsSV, const char* filename) {
-    ofstream out(filename);
-    if (!out.is_open()) {
-        cerr << "Không thể mở file: " << filename << '\n';
-        return;
-    }
-    out << dsSV.n << '\n';
-    for (int i = 0; i < dsSV.n; ++i) {
-        SinhVien sv = dsSV.ds[i];
-        out << sv.MASV << '\n';
         // Ghi danh sách điểm thi
-        nodeDiemThi* diem = sv.dsDiemThi;
-        int dem = 0;
-        for (nodeDiemThi* p = diem; p != nullptr; p = p->next) dem++;
-        out << dem << '\n';
-        for (nodeDiemThi* p = diem; p != nullptr; p = p->next) {
-            out << p->diem.MAMH << '|'<< p->diem.Diem << '\n';
-            // Ghi danh sách bài thi chi tiết
-            nodeBaithi* bt = p->diem.baithi;
-            int sobt = 0;
-            for (nodeBaithi* q = bt; q != nullptr; q = q->next) sobt++;
-            out << sobt << '\n';
-            for (nodeBaithi* q = bt; q != nullptr; q = q->next) {
-                out << q->btct.idcauhoi << '|'<< q->btct.traloi << '\n';
+        int soMon = 0;
+        for (nodeDiemThi* d = sv->dsDiemThi; d != NULL; d = d->next) {
+            soMon++;
+        }
+        out << soMon << '\n';
+
+        for (nodeDiemThi* d = sv->dsDiemThi; d != NULL; d = d->next) {
+            out << d->diem.MAMH << '|' << d->diem.Diem << '|';
+
+            // Ghi số câu hỏi đã trả lời
+            int soCau = 0;
+            for (nodeBaithi* c = d->diem.baithi; c != NULL; c = c->next) {
+                soCau++;
+            }
+            out << soCau << '\n';
+
+            for (nodeBaithi* c = d->diem.baithi; c != NULL; c = c->next) {
+                out << c->btct.idcauhoi << '|' << c->btct.traloi << '\n';
             }
         }
     }
     out.close();
 }
 
-void quangWrite(DanhSachLop &dsLop, DanhSachSinhVien &dsSV){
-    SaveLop(dsLop, "Lop.txt");
-    SaveDanhSachSinhVien(dsSV, "SinhVien.txt");
-    SaveLop_SinhVien(dsLop, "Lop_SinhVien.txt");
-    SaveDiemVaBaiThi(dsSV, "DiemThi.txt");
+void GhiDanhSachLop(const DanhSachLop& dsLop, const char* filename) {
+    ofstream out(filename);
+    if (!out) return;
 
-    cout << "save completed.\n";
-};
+    out << dsLop.n << '\n';
+    for (int i = 0; i < dsLop.n; ++i) {
+        Lop* lop = dsLop.lop[i];
+        out << lop->MALOP << '|' << lop->TENLOP << '|';
+
+        // Đếm số sinh viên
+        int count = 0;
+        for (nodeSinhVien* sv = lop->listSV; sv != NULL; sv = sv->next) {
+            count++;
+        }
+        out << count << '\n';
+
+        for (nodeSinhVien* sv = lop->listSV; sv != NULL; sv = sv->next) {
+            out << sv->sv->MASV << '\n';
+        }
+    }
+    out.close();
+}
+
+
+void quangWrite(const DanhSachLop& dsLop, nodeSinhVien* dsSV, const char* fileSV, const char* fileLop) {
+    GhiDanhSachSinhVien(dsSV, fileSV);
+    GhiDanhSachLop(dsLop, fileLop);
+    cout<<"Save completed"<<endl;
+}
 #endif

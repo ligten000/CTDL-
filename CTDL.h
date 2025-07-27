@@ -60,15 +60,16 @@ struct SinhVien {
 };
 
 // Sinh viên (Danh sách liên kết đơn)
-struct nodeSinhvien 
+struct nodeSinhVien
 {
-   SinhVien sv;
-   nodeSinhvien *next;
+   SinhVien*sv;
+   nodeSinhVien *next = NULL;
 };
+
 
 struct Lop {
     char MALOP[15], TENLOP[50];
-    nodeSinhvien * listSV = NULL;
+    nodeSinhVien *listSV = NULL;
 };
 
 // Lớp (Mảng con trỏ)
@@ -79,9 +80,4 @@ struct DanhSachLop
     Lop* lop[Max_lop];
 };
 
-const int MAX_SINHVIEN = 10000;
-struct DanhSachSinhVien {
-    int n;
-    SinhVien ds[MAX_SINHVIEN];
-};
 #endif

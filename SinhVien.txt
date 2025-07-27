@@ -1,4 +1,13 @@
 3
 SV001|Nguyen Van|An|NAM|123
+1
+CTDL|5|2
+C01|A
+C02|C
 SV002|Tran Thi|Binh|NU|abc
+1
+CTDL|10|2
+C01|A
+C02|C
 SV003|Le|Cuong|NAM|pass
+0
