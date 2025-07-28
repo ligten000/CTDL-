@@ -1,0 +1,9 @@
+2
+CS101|Lập trình cơ bản|3
+1|Câu hỏi 1: Ngôn ngữ lập trình nào được sử dụng phổ biến nhất?|Java|Python|C++|JavaScript|B
+2|Câu hỏi 2: Biến trong lập trình là gì?|Tên gọi cho vùng nhớ|Tên file|Tên hàm|Tên thư mục|A
+3|Câu hỏi 3: Vòng lặp for dùng để làm gì?|Lặp lại một khối lệnh|Tạo biến|In ra màn hình|Nhập dữ liệu|A
+MATH101|Toán học cơ bản|2
+4|Câu hỏi 1: 2 + 2 = ?|3|4|5|6|B
+5|Câu hỏi 2: Căn bậc hai của 16 là?|2|4|8|16|B
+END 

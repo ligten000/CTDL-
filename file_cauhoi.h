@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
 #include "CTDL.h"
 using namespace std;
 
