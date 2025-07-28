@@ -174,6 +174,7 @@ void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
     while (true) {
         memset(user, 0, sizeof(user));
         memset(pass, 0, sizeof(pass));
+        Normal();
         system("cls");
 
         // Giao diện

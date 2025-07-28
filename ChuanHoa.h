@@ -24,6 +24,36 @@ inline int strim(string &a, string &result){
     return 1;
 };
 
+#include <cstring>
+
+
+void chuanHoaKhoangCach(char S[]) {
+    int len = strlen(S);
+    int i = 0, j = 0;
+
+    // Bỏ khoảng trắng đầu
+    while (isspace(S[i])) i++;
+
+    bool spaceFound = false;
+    for (; i < len; i++) {
+        if (isspace(S[i])) {
+            if (!spaceFound) {
+                S[j++] = ' ';
+                spaceFound = true;
+            }
+        } else {
+            S[j++] = S[i];
+            spaceFound = false;
+        }
+    }
+
+    // Xóa khoảng trắng cuối
+    if (j > 0 && S[j - 1] == ' ')
+        j--;
+
+    S[j] = '\0';
+}
+
 inline int ChuanHoaTen(string &a,string &result) {
     result.clear();
     if (a.empty()) return 0;
