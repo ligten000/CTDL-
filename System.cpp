@@ -4,7 +4,7 @@
 #include "CTDL.h"
 #include "quangRead.h"
 #include "quangWrite.h"
-
+#include "GVSystem.h"
 using namespace std;
 
 const int so_item = 4;
@@ -141,6 +141,30 @@ SinhVien* timSinhVien(nodeSinhVien* &dsSV, char* MSV){
     return NULL;
 }
 
+bool SystemGV(DanhSachLop &dsLop, nodeSinhVien* &dsSV, int chon){
+    while (true) {
+        switch (chon){
+            case 1:
+                if (hienthidanhsachLop(dsLop)) {
+                    chon = MenuDong(thucdon);  // Gọi lại menu nếu người dùng thoát
+                    continue;
+                }
+                break;
+            case 2:
+                // các chức năng khác
+                break;
+            case 3:
+                break;
+            case 4:
+                return true;  // Thoát luôn SystemGV (nếu muốn vậy)
+            default:
+                chon = MenuDong(thucdon); // gọi lại menu khi lựa chọn không hợp lệ
+                break;
+        }
+    }
+    return false;
+}
+
 void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
     char user[32], pass[32];
     char ch;
@@ -200,9 +224,14 @@ void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
             if (strcmp(pass, "GV") == 0) {
                 gotoxy(x, y + 7); cout << "Dang nhap thanh cong!";
                 Sleep(1000);
-                int chon = MenuDong(thucdon);
-                break;
-            } else {
+                while (true) {
+                    int chon = MenuDong(thucdon);
+                    bool quayLaiLogin = SystemGV(dsLop, dsSV, chon);
+                    if (quayLaiLogin) break; // quay lại giao diện đăng nhập
+                }
+                continue; // tiếp tục vòng login từ đầu
+            }
+            else {
                 gotoxy(x, y + 7); cout << "Mat khau sai!";
                 Sleep(1500);
                 continue;
