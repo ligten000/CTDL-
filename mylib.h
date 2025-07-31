@@ -5,11 +5,13 @@
 #include <dos.h>
 #include <string.h>
 #include <windows.h>
+using namespace std;
 
 #define Enter 13
 //const int WHITE=15;
 #define PASSWORD "abcdef"
 //const int WHITE=15;
+
 
 char* Pwd (char S[40]) {
      int i=0;
@@ -38,7 +40,23 @@ void gotoxy(short x,short y)
         hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleCursorPosition(hConsoleOutput , Cursor_an_Pos);
 }  
+void clearLine(int x, int y, int length) {
+    gotoxy(x, y);
+    for (int i = 0; i < length; i++) std:: cout << ' ';
+    gotoxy(x, y);
+}
 
+void clearCurrentLine() {
+    cout << "\r\033[K";
+}
+
+void thongBaoLoi(const char* msg, int x, int y) {
+    gotoxy(x, y);
+    cout << msg;
+    Sleep(1000);
+    clearLine(x, y, strlen(msg));  // Xóa thông báo lỗi
+    gotoxy(x, y);
+}
 int wherex( void )
 {
     HANDLE hConsoleOutput;

@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 #include "CTDL.h"
+#include <cstring>
+
 using namespace std;
 
 // Ghi 1 cây câu hỏi theo thứ tự NLR (preorder)

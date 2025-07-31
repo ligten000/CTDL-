@@ -30,16 +30,40 @@ struct ListMonHoc{
     MonHoc list[MAX_ListMH];
 };
 
+// struct BaiThiChiTiet
+// {
+//     char idcauhoi[16];
+//     char traloi;
+// };
+
+// struct nodeBaithi{
+//     BaiThiChiTiet btct;
+//     nodeBaithi* next;
+// };
+
 struct BaiThiChiTiet
 {
-    char idcauhoi[16];
+    nodeCauhoi * cauhoi;
     char traloi;
 };
 
-struct nodeBaithi{
-    BaiThiChiTiet btct;
-    nodeBaithi* next;
+struct Baithi{
+    int n;
+    BaiThiChiTiet* dsBaithichitiet = NULL;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct DiemThi {
     char MAMH[16];
@@ -62,7 +86,7 @@ struct SinhVien {
 // Sinh viên (Danh sách liên kết đơn)
 struct nodeSinhVien
 {
-   SinhVien*sv;
+   SinhVien sv;
    nodeSinhVien *next = NULL;
 };
 

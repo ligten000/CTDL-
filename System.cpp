@@ -2,21 +2,19 @@
 #include <windows.h>
 #include "mylib.h"
 #include "CTDL.h"
-#include "quangRead.h"
-#include "quangWrite.h"
+#include "file_lop.h"
 #include "GVSystem.h"
 using namespace std;
 
-const int so_item = 4;
+const int so_item = 3;
 const int dong =10;
 const int cot = 30 ;
 const int Up = 72; // Extended code 
 const int Down = 80;
 const int item_menuSinhvien = 4;
 char thucdon [so_item][50] = {"1. Quan ly danh sach lop  ",
-			                  "2. Quan ly sinh vien      ",
-			                  "3. Quan ly mon hoc        ",
-			                  "4. Ket thuc chuong trinh  "};
+			                  "2. Quan ly mon hoc        ",
+			                  "3. Ket thuc chuong trinh  "};
 
 char menuSinhvien [item_menuSinhvien][50] = {"1. Bat dau thi            ",
                                              "2. Xem Diem               ",
@@ -122,26 +120,33 @@ int inMenuSinhVien(char td[item_menuSinhvien][50]){
     } while (1);
 }
 
-int xacminhTKSinhVien(char* user, char * pass,nodeSinhVien* dsSV){
-    if(dsSV == NULL) return 0;
-    for(nodeSinhVien* p = dsSV; p->next != NULL && strcmp(p->sv->MASV, user)<= 0; p = p->next){
-        if(strcmp(p->sv->MASV, user) == 0){
-            if(strcmp(p->sv->Password, pass) == 0) return 1;
-            else return 0;
+int xacminhTKSinhVien(char* user, char * pass,DanhSachLop&dsLop){
+    
+    if(dsLop.n == 0) return 0;
+    for(int i = 0; i<dsLop.n;i++){
+        for(nodeSinhVien* p = dsLop.lop[i]->listSV; p != NULL && strcmp(p->sv.MASV, user)<= 0; p = p->next){
+            if(strcmp(p->sv.MASV, user) == 0){
+                if(strcmp(p->sv.Password, pass) == 0) return 1;
+                else return 0;
+            }
         }
     }
     return 0;
 }
 
-SinhVien* timSinhVien(nodeSinhVien* &dsSV, char* MSV){
-    if(dsSV == NULL) return NULL;
-    for(nodeSinhVien* p; p->next != NULL && strcmp(p->sv->MASV, MSV)>0; p = p->next){
-        if(strcmp(p->sv->MASV, MSV) == 0) return p->sv;
+nodeSinhVien* timSinhVien(DanhSachLop&dsLop, char* MSV){
+    if(dsLop.n == 0) return NULL;
+    for(int i = 0; i<dsLop.n;i++){
+        for(nodeSinhVien* p = dsLop.lop[i]->listSV; p != NULL && strcmp(p->sv.MASV, MSV)<= 0; p = p->next){
+            if(strcmp(p->sv.MASV, MSV) == 0){
+                return p;
+            }
+        }
     }
     return NULL;
 }
 
-bool SystemGV(DanhSachLop &dsLop, nodeSinhVien* &dsSV, int chon){
+bool SystemGV(DanhSachLop &dsLop, int chon){
     while (true) {
         switch (chon){
             case 1:
@@ -154,8 +159,6 @@ bool SystemGV(DanhSachLop &dsLop, nodeSinhVien* &dsSV, int chon){
                 // các chức năng khác
                 break;
             case 3:
-                break;
-            case 4:
                 return true;  // Thoát luôn SystemGV (nếu muốn vậy)
             default:
                 chon = MenuDong(thucdon); // gọi lại menu khi lựa chọn không hợp lệ
@@ -165,11 +168,11 @@ bool SystemGV(DanhSachLop &dsLop, nodeSinhVien* &dsSV, int chon){
     return false;
 }
 
-void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
+void login(DanhSachLop& dsLop) {
     char user[32], pass[32];
     char ch;
     int x = 35, y = 8;
-    SinhVien* currentLogin;
+    nodeSinhVien* currentLogin = NULL;
 
     while (true) {
         memset(user, 0, sizeof(user));
@@ -227,7 +230,7 @@ void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
                 Sleep(1000);
                 while (true) {
                     int chon = MenuDong(thucdon);
-                    bool quayLaiLogin = SystemGV(dsLop, dsSV, chon);
+                    bool quayLaiLogin = SystemGV(dsLop, chon);
                     if (quayLaiLogin) break; // quay lại giao diện đăng nhập
                 }
                 continue; // tiếp tục vòng login từ đầu
@@ -240,8 +243,8 @@ void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
         }
 
         // Đăng nhập sinh viên
-        if (xacminhTKSinhVien(user, pass, dsSV) == 1) {
-            currentLogin = timSinhVien(dsSV, user);
+        if (xacminhTKSinhVien(user, pass, dsLop) == 1) {
+            currentLogin = timSinhVien(dsLop, user);
             gotoxy(x, y + 7); cout << "Dang nhap thanh cong!";
             Sleep(1000);
             int chon = inMenuSinhVien(menuSinhvien);
@@ -258,10 +261,9 @@ void login(nodeSinhVien* dsSV, DanhSachLop dsLop) {
 int main(int argc, char const *argv[])
 {
     DanhSachLop dsLop;
-    nodeSinhVien *dsSV = NULL;
 
-    quangRead(dsLop, dsSV, "SinhVien.txt","Lop.txt"); 
-    quangWrite(dsLop, dsSV, "SinhVien.txt","Lop.txt");
-    login(dsSV, dsLop);
+    DocDanhSachLop(dsLop,"Lop.txt"); 
+
+    login(dsLop);
     return 0;
 }
