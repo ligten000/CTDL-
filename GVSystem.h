@@ -8,77 +8,13 @@
 #include <cstring>
 #include <iomanip>
 #include <sstream>
+#include "GiaoDienLop.h"
 using namespace std;
-
-const int Page_Size = 15;
 
 int demSinhVien (Lop*& lop){
     int dem = 0;
     for(nodeSinhVien * p = lop->listSV; p != NULL; p = p->next)dem++;
     return dem;
-}
-
-void NhapMa(char ma[], int n) {
-    int i = 0;
-    char c;
-    while (true) {
-        c = getch();
-
-        // Enter
-        if (c == 13) break;
-
-        // Backspace
-        if (c == 8) {
-            if (i > 0) {
-                i--;
-                cout << "\b \b";
-            }
-        }
-        // Ký tự hợp lệ
-        else {
-            c = toupper(c);
-            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_') {
-                if (i < n) {
-                    ma[i++] = c;
-                    cout << c;
-                }
-            }
-        }
-    }
-
-    ma[i] = '\0'; 
-    cout << endl;
-}
-void NhapChuoi(char ma[], int n) {
-    int i = 0;
-    char c;
-    while (true) {
-        c = getch();
-
-        // Enter
-        if (c == 13) break;
-
-        // Backspace
-        if (c == 8) {
-            if (i > 0) {
-                i--;
-                cout << "\b \b";
-            }
-        }
-        // Ký tự hợp lệ
-        else {
-            c = toupper(c);
-            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c== ' ') {
-                if (i < n) {
-                    ma[i++] = c;
-                    cout << c;
-                }
-            }
-        }
-    }
-
-    ma[i] = '\0'; 
-    cout << endl;
 }
 
 void xapxepDanhSachLop(DanhSachLop & dsLop){
@@ -103,20 +39,20 @@ void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
         cout << "\nKhong the them lop moi. Danh sach lop da day!\n";
         return;
     }
-    gotoxy(0,19);
+    gotoxy(0,mouse);
     cout << "Nhap ma lop";
-    gotoxy(13,19); cout<<":";
-    gotoxy(0,20);
+    gotoxy(13,mouse); cout<<":";
+    gotoxy(0,mouse +1);
     cout << "Nhap ten lop";
-    gotoxy(13,20); cout<<":";
+    gotoxy(13,mouse +1); cout<<":";
     int i;
     while (true)
     {   
-        gotoxy(15,19);
+        gotoxy(15,mouse);
         NhapMa(malop, 15);
         if (strlen(malop) == 0) {
-            clearLine(15,19,15);
-            thongBaoLoi("Ma lop khong duoc rong!", 15,19);
+            clearLine(15,mouse,15);
+            thongBaoLoi("Ma lop khong duoc rong!", 15,mouse);
             continue;
         }
         
@@ -132,8 +68,8 @@ void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
             }
 
             if (trung) {
-                clearLine(15,19,15);
-                thongBaoLoi("Ma lop da ton tai", 15,19);
+                clearLine(15,mouse,15);
+                thongBaoLoi("Ma lop da ton tai", 15,mouse);
             } else {
                 break; 
             }   
@@ -141,19 +77,19 @@ void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
     
     // Kiểm tra trùng mã lớp
     while (true) {
-        gotoxy(15,20);
+        gotoxy(15,mouse +1);
         NhapChuoi(tenlop, 50);
         chuanHoaKhoangCach(tenlop);
         if (strlen(tenlop) == 0) {
-            clearLine(15,20,50);
-            thongBaoLoi("Ten lop khong duoc rong!",15,20);
+            clearLine(15,mouse +1,50);
+            thongBaoLoi("Ten lop khong duoc rong!",15,mouse +1);
         } else {
             break;
         }
     }
 
     // Xác nhận thêm
-    gotoxy(0,21);
+    gotoxy(0,mouse +2);
     cout << "Ban co chac chan muon them lop moi? (y/n): ";
     char confirm = toupper(getch());
     switch(confirm){
@@ -181,16 +117,16 @@ void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
 
 void xoaLop(DanhSachLop&dsLop){
     char malop[15];
-    gotoxy(0,19);
+    gotoxy(0,mouse);
     cout << "Nhap ma lop:";
     int i;
     while (true)
     {   
-        gotoxy(15,19);
+        gotoxy(15,mouse);
         NhapMa(malop, 15);
         if (strlen(malop) == 0) {
-            clearLine(15,19,15);
-            thongBaoLoi("Ma lop khong duoc rong!", 15,19);
+            clearLine(15,mouse,15);
+            thongBaoLoi("Ma lop khong duoc rong!", 15,mouse);
             continue;
         }
         bool tontai = false;
@@ -206,19 +142,19 @@ void xoaLop(DanhSachLop&dsLop){
         }
 
         if (tontai == false) {
-            clearLine(15,19,15);
-            thongBaoLoi("Ma lop khong ton tai!",15,19);
+            clearLine(15,mouse,15);
+            thongBaoLoi("Ma lop khong ton tai!",15,mouse);
         } else {
             if(demSinhVien(dsLop.lop[i]) != 0){
-                gotoxy(0,20);   
-                thongBaoLoi("Lop da co sinh vien, khong the xoa!",0,20);
-                clearLine(15,19,30);
-                gotoxy(15,19);
+                gotoxy(0,mouse +1);   
+                thongBaoLoi("Lop da co sinh vien, khong the xoa!",0,mouse +1);
+                clearLine(15,mouse,30);
+                gotoxy(15,mouse);
             }
             else break;
         }
     }
-    gotoxy(0,20);
+    gotoxy(0,mouse +1);
     cout << "Ban co chac chan muon xoa lop khong? (y/n): ";
     char confirm;
     while(true){
@@ -244,17 +180,17 @@ void xoaLop(DanhSachLop&dsLop){
 
 void suaLop(DanhSachLop& ds) {
     char malop[15], tenlop[50];
-    gotoxy(0,19);
+    gotoxy(0,mouse);
     cout << "Nhap ma lop can sua:";
     int i;
 
     // Bước 1: Tìm lớp theo mã
     while (true) {
-        gotoxy(21,19);
+        gotoxy(21,mouse);
         NhapMa(malop, 15);
         if (strlen(malop) == 0) {
-            clearLine(21,19,15);
-            thongBaoLoi("Ma lop khong duoc rong!", 21, 19);
+            clearLine(21,mouse,15);
+            thongBaoLoi("Ma lop khong duoc rong!", 21, mouse);
             continue;
         }
 
@@ -269,8 +205,8 @@ void suaLop(DanhSachLop& ds) {
         }
 
         if (!found) {
-            clearLine(21,19,15);
-            thongBaoLoi("Ma lop khong ton tai", 21, 19);
+            clearLine(21,mouse,15);
+            thongBaoLoi("Ma lop khong ton tai", 21, mouse);
         } else break;
     }
 
@@ -278,23 +214,23 @@ void suaLop(DanhSachLop& ds) {
     strcpy(malop, ds.lop[i]->MALOP);
     strcpy(tenlop, ds.lop[i]->TENLOP);
 
-    clearLine(0,19,50);
-    gotoxy(0,19);
+    clearLine(0,mouse,50);
+    gotoxy(0,mouse);
     cout << "Thong tin lop (ENTER de sua, ESC de thoat, S de luu thay doi)";
 
-    int currentRow = 20; // 20: MALOP, 21: TENLOP
+    int currentRow = mouse+1; 
     char ch, confirm;
     bool saved = true;
 
     while (true) {
         // Vẽ lại giao diện
-        for (int row = 20; row <= 21; row++) {
+        for (int row = mouse +1; row <= mouse +2; row++) {
             gotoxy(0, row);
             cout << (row == currentRow ? "->" : "  ");
-            if (row == 20) {
-                cout << " Ma lop : "; gotoxy(15, 20); cout << setw(15) << left << malop;
+            if (row == mouse +1) {
+                cout << " Ma lop : "; gotoxy(15, mouse +1); cout << setw(15) << left << malop;
             } else {
-                cout << " Ten lop: "; gotoxy(15, 21); cout << setw(50) << left << tenlop;
+                cout << " Ten lop: "; gotoxy(15, mouse +2); cout << setw(50) << left << tenlop;
             }
         }
 
@@ -303,9 +239,9 @@ void suaLop(DanhSachLop& ds) {
         switch (ch) {
         case 13: // ENTER để chỉnh sửa dòng hiện tại
             saved = false;
-            if (currentRow == 20) {
-                clearLine(15, 20, 15);
-                gotoxy(15, 20);
+            if (currentRow == mouse +1) {
+                clearLine(15, mouse +1, 15);
+                gotoxy(15, mouse +1);
                 NhapMa(malop, 15);
 
                 if (strlen(malop) == 0) {
@@ -321,13 +257,13 @@ void suaLop(DanhSachLop& ds) {
                         }
                     }
                     if (trung) {
-                        thongBaoLoi("Ma lop da ton tai", 15, 20);
+                        thongBaoLoi("Ma lop da ton tai", 15, mouse +1);
                         strcpy(malop, ds.lop[i]->MALOP);
                     }
                 }
-            } else if (currentRow == 21) {
-                clearLine(15, 21, 50);
-                gotoxy(15, 21);
+            } else if (currentRow == mouse +2) {
+                clearLine(15, mouse +2, 50);
+                gotoxy(15, mouse +2);
                 NhapChuoi(tenlop, 50);
                 chuanHoaKhoangCach(tenlop);
                 if (strlen(tenlop) == 0)
@@ -337,7 +273,7 @@ void suaLop(DanhSachLop& ds) {
 
         case 'S': // Lưu thay đổi
             if(saved == false){
-                gotoxy(0,22);
+                gotoxy(0,mouse +3);
                 cout << "Ban co chac muon luu thay doi khong? (Y/N): ";
                 while (true) {
                     confirm = toupper(getch());
@@ -348,12 +284,12 @@ void suaLop(DanhSachLop& ds) {
                         xapxepDanhSachLop(ds);
                         GhiDanhSachLop(ds, "Lop.txt");
                         thongBaoLoi("Luu thanh cong", 0,23);
-                        gotoxy(0,22);
+                        gotoxy(0,mouse +3);
                         clearCurrentLine();
                         break;
                     } else if (confirm == 'N') {
                         thongBaoLoi("Huy luu", 0,23);
-                        gotoxy(0,22);
+                        gotoxy(0,mouse +3);
                         clearCurrentLine();
                         break;
                     }
@@ -362,15 +298,15 @@ void suaLop(DanhSachLop& ds) {
             break;
 
         case 72: // Mũi tên lên
-            if (currentRow > 20) currentRow--;
+            if (currentRow > mouse +1) currentRow--;
             break;
         case 80: // Mũi tên xuống
-            if (currentRow < 21) currentRow++;
+            if (currentRow < mouse +2) currentRow++;
             break;
 
         case 27: // ESC - Thoát nếu chưa lưu
             if (saved) return;
-            gotoxy(0,22);
+            gotoxy(0,mouse +3);
             cout << "Chua luu thay doi, co chac muon thoat khong (Y/N): ";
             while (true) {
                 confirm = toupper(getch());
@@ -388,72 +324,158 @@ void suaLop(DanhSachLop& ds) {
     }
 }
 
+void xemLop(DanhSachLop & ds){
+    char malop[15];
+    int i;
+    gotoxy(0,mouse);
+    cout << "Nhap ma lop: ";
+    
+    while (true) {
+        gotoxy(13,mouse);
+        NhapMa(malop, 15);
+        if (strlen(malop) == 0) {
+            clearLine(13,mouse,15);
+            thongBaoLoi("Ma lop khong duoc rong!", 13, mouse);
+            continue;
+        }
+
+        bool found = false;
+        for (i = 0; i < ds.n; ++i) {
+            int cmp = strcmp(ds.lop[i]->MALOP, malop);
+            if (cmp == 0) {
+                found = true;
+                break;
+            }
+            if (cmp > 0) break;
+        }
+
+        if (!found) {
+            clearLine(21,mouse,15);
+            thongBaoLoi("Ma lop khong ton tai", 13, mouse);
+        } else break;
+    }
+    gotoxy(0,mouse +1);
+    int slSV = demSinhVien(ds.lop[i]);
+    cout << "Ban co chac chan muon xem lop khong? (y/n): ";
+    char confirm;
+    while(true){
+        confirm = toupper(getch());
+        switch(confirm){
+            case 'N':
+                return;
+            case 'Y': 
+                HienThiDanhSachSinhVien(ds,ds.lop[i]->listSV,slSV);
+                return ;
+            default:
+                continue;  
+        } 
+    } 
+}
+
 
 bool hienthidanhsachLop(DanhSachLop &dsLop) {
-    SetColor(15);
-	SetBGColor(0);
+    Normal();system("cls");
     char a;
     int currentPage = 1;
     int start;
     int end;
-    int numPage = (dsLop.n/Page_Size)+1;
+    int numPage = (dsLop.n + Page_Size - 1/Page_Size);
+
+    // Vẽ đường viền trên của bảng
+    cout << char(218) << string(10, char(196)) << char(194)
+            << string(20, char(196)) << char(194)
+            << string(30, char(196)) << char(194)
+            << string(20, char(196)) << char(191) << endl;
+
+    // Vẽ dòng tiêu đề có khung dọc
+    cout << char(179) << setw(10) << left << "STT"
+            << char(179) << setw(20) << left << "Ma Lop"
+            << char(179) << setw(30) << left << "Ten Lop"
+            << char(179) << setw(20) << left << "So luong SV"
+            << char(179) << endl;
+
+    // Vẽ đường phân cách tiêu đề và dữ liệu
+    cout << char(195) << string(10, char(196)) << char(197)
+            << string(20, char(196)) << char(197)
+            << string(30, char(196)) << char(197)
+            << string(20, char(196)) << char(180) << endl;
+
+
+        gotoxy(0, 18);
+        cout << "A: Them | D: Xoa | E: Sua | C: Chon | S: luu | Q: Thoat" << endl;
     while (true) {
-        system("cls");
-        cout << setw(10) << left << "STT"
-             << setw(20) << left << "Ma Lop"
-             << setw(30) << left << "Ten Lop"
-             << setw(20) << left << "So luong SV" << endl;
-        cout << string(80, '-') << endl;
         start = (currentPage - 1) * Page_Size;
         end = min(start + Page_Size, dsLop.n);
+
+        // Xoá vùng dữ liệu cũ (ghi đè bằng khoảng trắng)
+        for (int i = 0; i <= Page_Size; i++) {
+            gotoxy(0, 3 + i);
+            cout << string(83, ' ');
+        }
+
+        // In dữ liệu từng dòng
+        gotoxy(0, 3);
         for (int i = start; i < end; i++) {
-            cout << setw(10) << left << i + 1
-                 << setw(20) << left << dsLop.lop[i]->MALOP
-                 << setw(30) << left << dsLop.lop[i]->TENLOP
-                 << setw(20) << left << demSinhVien(dsLop.lop[i])
-                 << endl;
+            cout << char(179) << setw(10) << left << i + 1
+                 << char(179) << setw(20) << left << dsLop.lop[i]->MALOP
+                 << char(179) << setw(30) << left << dsLop.lop[i]->TENLOP
+                 << char(179) << setw(20) << left << demSinhVien(dsLop.lop[i])
+                 << char(179) << endl;
         }
-
-        gotoxy(0, 17);
-        cout << string(80, '-') << endl;
-        gotoxy(38,17);
+        for(int i = end+1; i<= start + Page_Size; i++){
+            cout << char(179) << setw(10) << left << i
+                 << char(179) << setw(20) << left << ""
+                 << char(179) << setw(30) << left << ""
+                 << char(179) << setw(20) << left << ""
+                 << char(179) << endl;
+        }
+        cout << char(192) << string(10, char(196)) << char(193)
+             << string(20, char(196)) << char(193)
+             << string(30, char(196)) << char(193)
+             << string(20, char(196)) << char(217) << endl;
+        gotoxy(36,18);
         cout<<"("<<currentPage<<"/"<<numPage<<")"<<endl;
+        gotoxy(0, 19);
         cout << "A: Them | D: Xoa | E: Sua | C: Chon | S: luu | Q: Thoat" << endl;
-
-        a = toupper(getch());
-        switch (a) {
-            case 'A':   // Thêm lớp
-                {Lop* lop = new Lop;
-                char malop[15],tenlop[50];
-                themLop(dsLop, lop, malop, tenlop);
-                break;
-                }
-            case 'D':   // Xóa lớp
-                xoaLop(dsLop);
-                break;
-            case 'E':   // Sửa lớp
-                suaLop(dsLop);
-                break;
-            case 'C':   // Chọn lớp
-                break;
-            case 'S':
-                GhiDanhSachLop(dsLop, "Lop.txt");
-                cout<<"Luu thanh cong";
-                Sleep(1000);
-                clearCurrentLine();
-                break;
-            case 'Q':   // Thoát khỏi danh sách
-                return true;
-            case 75:
-                if(currentPage > 1)currentPage--;
-                break;
-            case 77:
-                if(currentPage < numPage)currentPage++;
-                break;
-            default:
-                break;
+        for(int i = mouse; i< mouse + 10; i++){
+            gotoxy(0,i);
+            clearCurrentLine();
         }
-        // Sau mỗi thao tác -> quay lại đầu vòng lặp và in lại danh sách
+        a = toupper(getch());
+        if (a == -32 || a == 0) { // phím đặc biệt
+            a = getch();
+            if (a == 75 && currentPage > 1) currentPage--; // mũi tên trái
+            else if (a == 77 && currentPage < numPage) currentPage++; // mũi tên phải
+        }
+        else{
+            switch (a) {
+                case 'A':   // Thêm lớp
+                    {Lop* lop = new Lop;
+                    char malop[15],tenlop[50];
+                    themLop(dsLop, lop, malop, tenlop);
+                    break;
+                    }
+                case 'D':   // Xóa lớp
+                    xoaLop(dsLop);
+                    break;
+                case 'E':   // Sửa lớp
+                    suaLop(dsLop);
+                    break;
+                case 'C':   // Chọn lớp
+                    xemLop(dsLop);
+                    break;
+                case 'S':
+                    GhiDanhSachLop(dsLop, "Lop.txt");
+                    cout<<"Luu thanh cong";
+                    Sleep(1000);
+                    clearCurrentLine();
+                    break;
+                case 'Q':   // Thoát khỏi danh sách
+                    return true;
+                default:
+                    break;
+            }
+        }// Sau mỗi thao tác -> quay lại đầu vòng lặp và in lại danh sách
     }
 
     return false;

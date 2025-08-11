@@ -1,4 +1,5 @@
-
+#ifndef MYLIB_H
+#define MYLIB_H
 #include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,109 @@ using namespace std;
 #define PASSWORD "abcdef"
 //const int WHITE=15;
 
+void NhapMa(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+void NhapChuoi(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c== ' ') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+void NhapSo(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= '0' && c <= '9')) {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+int ChuoiThanhSo(const char ma[]) {
+    int num = 0;
+    for (int i = 0; ma[i] != '\0'; i++) {
+        num = num * 10 + (ma[i] - '0');
+    }
+    return num;
+}
 
 char* Pwd (char S[40]) {
      int i=0;
@@ -120,3 +224,13 @@ void SetBGColor(WORD color)
 void clrscr() {
 	system("cls");
 }
+
+void Normal () {
+	SetColor(15);
+	SetBGColor(0);
+}
+void HighLight () {
+	SetColor(15);
+	SetBGColor(1);
+}
+#endif 

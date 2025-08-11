@@ -42,7 +42,7 @@ void GhiFileDSMonHoc(const ListMonHoc &ds, const char* filename) {
 // Chèn 1 câu hỏi vào cây nhị phân tìm kiếm theo Id (dạng số nguyên)
 void ChenCauHoiVaoCay(nodeCauhoi* &root, const CauHoi &ch) {
     if (root == NULL) {
-        root = new nodeCauhoi{ch, true, NULL, NULL};
+        root = new nodeCauhoi{ch};
         return;
     }
     int id_new = atoi(ch.Id);

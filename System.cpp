@@ -3,122 +3,59 @@
 #include "mylib.h"
 #include "CTDL.h"
 #include "file_lop.h"
+#include "file_cauhoi.h"
 #include "GVSystem.h"
+#include "SVSystem.h"
+#include "Menu.h"
 using namespace std;
 
-const int so_item = 3;
-const int dong =10;
-const int cot = 30 ;
+const int dong = 5;
+const int cot = 40 ;
 const int Up = 72; // Extended code 
 const int Down = 80;
-const int item_menuSinhvien = 4;
-char thucdon [so_item][50] = {"1. Quan ly danh sach lop  ",
-			                  "2. Quan ly mon hoc        ",
-			                  "3. Ket thuc chuong trinh  "};
 
-char menuSinhvien [item_menuSinhvien][50] = {"1. Bat dau thi            ",
-                                             "2. Xem Diem               ",
-                                             "3. Doi mat khau           ",   
-                                             "4. Ket thuc chuong trinh  "};                          
+char* menu[] = {"Quan ly danh sach lop",
+                "Quan ly danh sach mon hoc",
+                "Thoat chuong trinh"};
 
-void Normal () {
-	SetColor(15);
-	SetBGColor(0);
-}
-void HighLight () {
-	SetColor(15);
-	SetBGColor(1);
-}
-int MenuDong(char td [so_item][50]){
+char * menuSV[] = { "Bat dau thi",
+                    "Xem diem",
+                    "Thoat chuong trinh"};                      
 
-  Normal(); system("cls");
-  int chon =0;
-  int i; 
-  for ( i=0; i< so_item ; i++)
-  { gotoxy(cot, dong +i);
-    cout << td[i];
-  }
-  HighLight();
-  gotoxy(cot,dong+chon);
-  cout << td[chon];
-  char kytu;
-do {
-  kytu = getch();
-  if (kytu==0) kytu = getch();
-  switch (kytu) {
-    case Up :if (chon+1 >1)
-  			  {
-  		        Normal();
-              	gotoxy(cot,dong+chon);
-              	cout << td[chon];
-              	chon --;
-              	HighLight();
-              	gotoxy(cot,dong+chon);
-              	cout << td[chon];
-  				
-  			  }
-  			  break;
-  	case Down :if (chon+1 <so_item)
-  			  {
-  		        Normal();
-              	gotoxy(cot,dong+chon);
-              	cout << td[chon];
-              	chon ++;
-              	HighLight();
-              	gotoxy(cot,dong+chon);
-              	cout << td[chon];
-  				
-  			  }
-  			  break;
-  	case 13 : return chon+1;
-  }  // end switch
-  } while (1);
-};
 
-int inMenuSinhVien(char td[item_menuSinhvien][50]){
+int UIMenu(char * menu[], int soItem ){
     Normal(); system("cls");
-    int chon =0;
-    int i; 
-    for ( i=0; i< item_menuSinhvien ; i++)
-    { gotoxy(cot, dong +i);
-        cout << td[i];
+    int chon = 0;
+    int i;
+    for(i = 0; i<soItem; i++){
+        RectangleNormal(menu[i],cot, i*5 + dong);
     }
-    HighLight();
-    gotoxy(cot,dong+chon);
-    cout << td[chon];
-    char kytu;
+    RectangleHighLight(menu[chon],cot,chon*5 + dong);
+    char ch;
     do {
-    kytu = getch();
-    if (kytu==0) kytu = getch();
-    switch (kytu) {
-        case Up :if (chon >0)
-                {
-                    Normal();
-                    gotoxy(cot,dong+chon);
-                    cout << td[chon];
-                    chon --;
-                    HighLight();
-                    gotoxy(cot,dong+chon);
-                    cout << td[chon];
-                    
-                }
-                break;
-        case Down :if (chon <item_menuSinhvien - 1)
-                {
-                    Normal();
-                    gotoxy(cot,dong+chon);
-                    cout << td[chon];
-                    chon ++;
-                    HighLight();
-                    gotoxy(cot,dong+chon);
-                    cout << td[chon];
-                    
-                }
-                break;
-        case 13 : return chon+1;
-    }  // end switch
+        ch = getch();
+        if (ch==0) ch = getch();
+        switch (ch) {
+            case Up :if (chon > 0)
+                    {
+                        RectangleNormal(menu[chon], cot, chon*5+dong);
+                        chon --;
+                        RectangleHighLight(menu[chon], cot, chon*5+dong);
+                    }
+                    break;
+            case Down :if (chon < soItem - 1)
+                    {
+                        RectangleNormal(menu[chon], cot, chon*5+dong);
+                        chon ++;
+                        RectangleHighLight(menu[chon], cot, chon*5+dong); 
+                    }
+                    break;
+            case 13 : return chon+1;
+        }  // end switch
     } while (1);
 }
+
+
 
 int xacminhTKSinhVien(char* user, char * pass,DanhSachLop&dsLop){
     
@@ -146,12 +83,12 @@ nodeSinhVien* timSinhVien(DanhSachLop&dsLop, char* MSV){
     return NULL;
 }
 
-bool SystemGV(DanhSachLop &dsLop, int chon){
+bool SystemGV(DanhSachLop &dsLop, int chon, int item){
     while (true) {
         switch (chon){
             case 1:
                 if (hienthidanhsachLop(dsLop)) {
-                    chon = MenuDong(thucdon);  // Gọi lại menu nếu người dùng thoát
+                    chon = UIMenu(menu, item);  // Gọi lại menu nếu người dùng thoát
                     continue;
                 }
                 break;
@@ -161,14 +98,33 @@ bool SystemGV(DanhSachLop &dsLop, int chon){
             case 3:
                 return true;  // Thoát luôn SystemGV (nếu muốn vậy)
             default:
-                chon = MenuDong(thucdon); // gọi lại menu khi lựa chọn không hợp lệ
+                chon = UIMenu(menu, item);// gọi lại menu khi lựa chọn không hợp lệ
                 break;
         }
     }
     return false;
 }
 
-void login(DanhSachLop& dsLop) {
+bool SystemSV(nodeSinhVien* &sv, DanhSachLop& dsLop,ListMonHoc &dsMH, int chon, int item){
+    while (true) {
+        switch (chon){
+            case 1:
+                chuanBiThi(sv, dsLop, dsMH);
+                chon = UIMenu(menuSV, item);
+            case 2:
+                // các chức năng khác
+                break;
+            case 3:
+                return true;  // Thoát luôn SystemGV (nếu muốn vậy)
+            default:
+                chon = UIMenu(menu, item);
+                break;
+        }
+    }
+    return false;
+}
+
+void login(DanhSachLop& dsLop, ListMonHoc& dsMH) {
     char user[32], pass[32];
     char ch;
     int x = 35, y = 8;
@@ -181,11 +137,13 @@ void login(DanhSachLop& dsLop) {
         system("cls");
 
         // Giao diện
-        gotoxy(x, y);     cout << "============================";
-        gotoxy(x, y + 1); cout << "|      DANG NHAP HE THONG     |";
-        gotoxy(x, y + 2); cout << "============================";
-        gotoxy(x, y + 4); cout << "User     : ";
-        gotoxy(x, y + 5); cout << "Password : ";
+        gotoxy(x, y);     cout << char(218)<<string(27,char(196))<<char(191);
+        gotoxy(x, y + 1); cout << char(179)<<"    DANG NHAP HE THONG     "<<char(179);
+        gotoxy(x, y + 2); cout << char(195)<<string(27,char(196))<<char(180);
+        gotoxy(x, y + 3); cout << char(179);gotoxy(x + 28, y + 3);cout<<char(179);
+        gotoxy(x, y + 4); cout << char(179)<<"User     : ";gotoxy(x + 28, y + 4);cout<<char(179);
+        gotoxy(x, y + 5); cout << char(179)<<"Password : ";gotoxy(x + 28, y + 5);cout<<char(179);
+        gotoxy(x, y + 6); cout << char(192)<<string(27,char(196))<<char(217);
 
         // Nhập user
         gotoxy(x + 12, y + 4);
@@ -206,7 +164,7 @@ void login(DanhSachLop& dsLop) {
 
         // Nhập pass
         gotoxy(x + 12, y + 5);
-        cout << string(30, ' ');
+        cout << string(15, ' ');
         gotoxy(x + 12, y + 5);
         int len_pass = 0;
         while (true) {
@@ -229,8 +187,10 @@ void login(DanhSachLop& dsLop) {
                 gotoxy(x, y + 7); cout << "Dang nhap thanh cong!";
                 Sleep(1000);
                 while (true) {
-                    int chon = MenuDong(thucdon);
-                    bool quayLaiLogin = SystemGV(dsLop, chon);
+                    int item = sizeof(menu)/sizeof(menu[0]);
+                    int chon = UIMenu(menu,item);
+                    // int chon = MenuDong(thucdon);
+                    bool quayLaiLogin = SystemGV(dsLop, chon, item);
                     if (quayLaiLogin) break; // quay lại giao diện đăng nhập
                 }
                 continue; // tiếp tục vòng login từ đầu
@@ -247,8 +207,10 @@ void login(DanhSachLop& dsLop) {
             currentLogin = timSinhVien(dsLop, user);
             gotoxy(x, y + 7); cout << "Dang nhap thanh cong!";
             Sleep(1000);
-            int chon = inMenuSinhVien(menuSinhvien);
-            break;
+            int item = sizeof(menuSV)/sizeof(menuSV[0]);
+            int chon = UIMenu(menuSV, item);
+            bool quayLaiLogin = SystemSV(currentLogin, dsLop,dsMH, chon, item);
+            if (quayLaiLogin) continue;
         }
 
         // Sai tài khoản
@@ -261,9 +223,11 @@ void login(DanhSachLop& dsLop) {
 int main(int argc, char const *argv[])
 {
     DanhSachLop dsLop;
+    ListMonHoc dsMonHoc;
 
-    DocDanhSachLop(dsLop,"Lop.txt"); 
+    DocFileDSMonHoc(dsMonHoc, "MonHoc.txt");
+    DocDanhSachLop(dsLop, dsMonHoc, "Lop.txt"); 
 
-    login(dsLop);
+    login(dsLop, dsMonHoc);
     return 0;
 }
