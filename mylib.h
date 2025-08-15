@@ -77,6 +77,38 @@ void NhapChuoi(char ma[], int n) {
     cout << endl;
 }
 
+void NhapTen(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || c== ' ') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
 void NhapSo(char ma[], int n) {
     int i = 0;
     char c;

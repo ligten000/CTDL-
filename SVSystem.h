@@ -329,23 +329,4 @@ void chuanBiThi(nodeSinhVien* &sv, DanhSachLop &dsLop, ListMonHoc &dsMH){
     }
 }
 
-// bool SystemSV(nodeSinhVien* &sv,ListMonHoc &dsMH, int chon, int item){
-//     while (true) {
-//         switch (chon){
-//             case 1:
-//                 chuanBiThi(sv, dsMH);
-//                 return true;
-//             case 2:
-//                 // các chức năng khác
-//                 break;
-//             case 3:
-//                 return true;  // Thoát luôn SystemGV (nếu muốn vậy)
-//             default:
-//                 // gọi lại menu khi lựa chọn không hợp lệ
-//                 break;
-//         }
-//     }
-//     return false;
-// }
-
 #endif

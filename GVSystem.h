@@ -11,12 +11,6 @@
 #include "GiaoDienLop.h"
 using namespace std;
 
-int demSinhVien (Lop*& lop){
-    int dem = 0;
-    for(nodeSinhVien * p = lop->listSV; p != NULL; p = p->next)dem++;
-    return dem;
-}
-
 void xapxepDanhSachLop(DanhSachLop & dsLop){
     for (int i = 0; i < dsLop.n - 1; i++) {
         int minIndex = i;
@@ -145,7 +139,7 @@ void xoaLop(DanhSachLop&dsLop){
             clearLine(15,mouse,15);
             thongBaoLoi("Ma lop khong ton tai!",15,mouse);
         } else {
-            if(demSinhVien(dsLop.lop[i]) != 0){
+            if(demSinhVien(dsLop.lop[i]->listSV) != 0){
                 gotoxy(0,mouse +1);   
                 thongBaoLoi("Lop da co sinh vien, khong the xoa!",0,mouse +1);
                 clearLine(15,mouse,30);
@@ -355,7 +349,6 @@ void xemLop(DanhSachLop & ds){
         } else break;
     }
     gotoxy(0,mouse +1);
-    int slSV = demSinhVien(ds.lop[i]);
     cout << "Ban co chac chan muon xem lop khong? (y/n): ";
     char confirm;
     while(true){
@@ -364,7 +357,7 @@ void xemLop(DanhSachLop & ds){
             case 'N':
                 return;
             case 'Y': 
-                HienThiDanhSachSinhVien(ds,ds.lop[i]->listSV,slSV);
+                HienThiDanhSachSinhVien(ds,ds.lop[i]->listSV);
                 return ;
             default:
                 continue;  
@@ -419,7 +412,7 @@ bool hienthidanhsachLop(DanhSachLop &dsLop) {
             cout << char(179) << setw(10) << left << i + 1
                  << char(179) << setw(20) << left << dsLop.lop[i]->MALOP
                  << char(179) << setw(30) << left << dsLop.lop[i]->TENLOP
-                 << char(179) << setw(20) << left << demSinhVien(dsLop.lop[i])
+                 << char(179) << setw(20) << left << demSinhVien(dsLop.lop[i]->listSV)
                  << char(179) << endl;
         }
         for(int i = end+1; i<= start + Page_Size; i++){
