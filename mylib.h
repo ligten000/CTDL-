@@ -6,6 +6,8 @@
 #include <dos.h>
 #include <string.h>
 #include <windows.h>
+#include <sstream> 
+#include <iomanip> 
 using namespace std;
 
 #define Enter 13

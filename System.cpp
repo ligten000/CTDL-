@@ -6,6 +6,7 @@
 #include "file_cauhoi.h"
 #include "GVSystem.h"
 #include "SVSystem.h"
+#include "GiaoDienMonHoc.h"
 #include "Menu.h"
 using namespace std;
 
@@ -93,7 +94,10 @@ bool SystemGV(DanhSachLop &dsLop, ListMonHoc &dsMH, int chon, int item){
                 }
                 break;
             case 2:
-                // các chức năng khác
+                if(hienthidanhsachMonHoc(dsMH)){
+                    chon = UIMenu(menu, item);  // Gọi lại menu nếu người dùng thoát
+                    continue;
+                }
                 break;
             case 3:
                 return true;  // Thoát luôn SystemGV (nếu muốn vậy)
@@ -225,7 +229,7 @@ int main(int argc, char const *argv[])
     DanhSachLop dsLop;
     ListMonHoc dsMonHoc;
 
-    DocFileDSMonHoc(dsMonHoc, "MonHoc.txt");
+    DocFile(dsMonHoc, "MonHoc.txt");
     DocDanhSachLop(dsLop, dsMonHoc, "Lop.txt"); 
 
     login(dsLop, dsMonHoc);

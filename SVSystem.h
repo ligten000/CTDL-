@@ -243,7 +243,7 @@ void BatDauThi(nodeDiemThi* &bt, int minute){
         if (bt->diem.baithi->dsBaithichitiet[i].traloi == bt->diem.baithi->dsBaithichitiet[i].cauhoi->data.DapAn)
             dapanDung++;
     }
-    diem = float(dapanDung)/float(bt->diem.baithi->n);
+    diem = (float(dapanDung)/float(bt->diem.baithi->n))*10;
     gotoxy(10,1); cout<<diem;
     gotoxy(7,2); cout<<dapanDung<<"/"<<bt->diem.baithi->n;
     bt->diem.Diem = diem;
