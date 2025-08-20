@@ -318,7 +318,7 @@ void suaLop(DanhSachLop& ds) {
     }
 }
 
-void xemLop(DanhSachLop & ds){
+void xemLop(DanhSachLop & ds, ListMonHoc &dsMonHoc){
     char malop[15];
     int i;
     gotoxy(0,mouse);
@@ -357,7 +357,7 @@ void xemLop(DanhSachLop & ds){
             case 'N':
                 return;
             case 'Y': 
-                HienThiDanhSachSinhVien(ds,ds.lop[i]->listSV);
+                HienThiDanhSachSinhVien(ds,ds.lop[i], dsMonHoc);
                 return ;
             default:
                 continue;  
@@ -366,7 +366,7 @@ void xemLop(DanhSachLop & ds){
 }
 
 
-bool hienthidanhsachLop(DanhSachLop &dsLop) {
+bool hienthidanhsachLop(DanhSachLop &dsLop, ListMonHoc &dsMonHoc) {
     Normal();system("cls");
     char a;
     int currentPage = 1;
@@ -455,7 +455,7 @@ bool hienthidanhsachLop(DanhSachLop &dsLop) {
                     suaLop(dsLop);
                     break;
                 case 'C':   // Chọn lớp
-                    xemLop(dsLop);
+                    xemLop(dsLop, dsMonHoc);
                     break;
                 case 'S':
                     GhiDanhSachLop(dsLop, "Lop.txt");

@@ -13,6 +13,13 @@ using namespace std;
 #define PASSWORD "abcdef"
 //const int WHITE=15;
 
+
+string formatDiem(float d) {
+    ostringstream oss;
+    oss << fixed << setprecision(1) << d;
+    return oss.str();
+}
+
 void NhapMa(char ma[], int n) {
     int i = 0;
     char c;

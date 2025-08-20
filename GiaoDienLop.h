@@ -6,19 +6,11 @@
 #include "ChuanHoa.h"
 #include "file_lop.h"
 #include "mylib.h"
+#include "GiaoDienXemDiem.h"
 #include <cstring>
 #include <iomanip>
 #include <sstream>
 using namespace std;
-
-const int Page_Size = 15;
-const int mouse = 20;
-
-int demSinhVien (nodeSinhVien*& head){
-    int dem = 0;
-    for(nodeSinhVien * p = head; p != NULL; p = p->next)dem++;
-    return dem;
-}
 
 int timSV(DanhSachLop& dsLop,char* MSV){
     if(dsLop.n == 0) return 0;
@@ -171,7 +163,7 @@ void xoaSV(nodeSinhVien* &head){
             continue;
         }
         if(p->sv.dsDiemThi != NULL){
-            thongBaoLoi("Sinh vien nay da cos diem thi, khong the xoa", 0, mouse + 2);
+            thongBaoLoi("Sinh vien nay da co diem thi, khong the xoa", 0, mouse + 2);
             continue;
         }
         char ch;
@@ -188,8 +180,6 @@ void xoaSV(nodeSinhVien* &head){
                     pre->next = p->next;
                     delete(p);
                 }
-                if(head == NULL)gotoxy(0, mouse + 4);
-                cout<<"HEAD = NULL";
                 thongBaoLoi("Xoa thanh cong!", 0, mouse + 3);
                 return;
             }
@@ -373,16 +363,20 @@ void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
             }
             if(a == 'S'){
                 notSaved = false;
-                strcpy(sua->sv.MASV, fields[0].value);
+                
                 strcpy(sua->sv.HO, fields[1].value);
                 strcpy(sua->sv.TEN, fields[2].value);
                 strcpy(sua->sv.PHAI, fields[3].value);
-                if (sua == head) {
+                if(strcmp(sua->sv.MASV, fields[0].value) != 0){
+                    strcpy(sua->sv.MASV, fields[0].value);
+                    if (sua == head) {
                     head = sua->next;
-                } else {
-                    pre->next = sua->next;
+                    } else {
+                        pre->next = sua->next;
+                    }
+                    chenSV(head, sua);
                 }
-                chenSV(head, sua);
+                
                 GhiDanhSachLop(dsLop, "Lop.txt");
             }
         }
@@ -414,9 +408,9 @@ void IntieuDeDSLop(){
         cout << "A: Them | D: Xoa | E: Sua | C: Chon | S: luu | Q: Thoat" << endl;
 }
 
-void HienThiDanhSachSinhVien(DanhSachLop &dsLop, nodeSinhVien* &head){
-	Normal();system("cls");
+void HienThiDanhSachSinhVien(DanhSachLop &dsLop, Lop* &lop, ListMonHoc &dsMonHoc){
     char a;
+    nodeSinhVien* head = lop->listSV;
     int slSV = demSinhVien(head);
     int currentPage = 1;
     int start;
@@ -429,12 +423,11 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, nodeSinhVien* &head){
 		start = (currentPage - 1) * Page_Size;
         end = min(start + Page_Size, slSV);
 
-		for (int i = 0; i < Page_Size; i++) {
-            gotoxy(0, 3 + i);
-            clearCurrentLine(); 
-        }
-        // Vẽ đường viền trên của bảng
+		Normal();system("cls");
         gotoxy(0,0);
+        cout<<"Ma lop: "<<lop->MALOP<<setw(10)<<"Ten lop"<<lop->TENLOP;
+        // Vẽ đường viền trên của bảng
+        gotoxy(0,1);
         cout 	<< char(218) << string(10, char(196)) << char(194)
                 << string(20, char(196)) << char(194)
                 << string(40, char(196)) << char(194)
@@ -456,7 +449,7 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, nodeSinhVien* &head){
                 << string(20, char(196)) << char(197)
                 << string(10, char(196)) << char(180) << endl;
 
-		gotoxy(0, 3);
+		gotoxy(0, 4);
 		int index = 0;
         nodeSinhVien* p = head;
         while (p != NULL && index < end) {
@@ -485,14 +478,11 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, nodeSinhVien* &head){
 				<< string(40, char(196)) << char(193)
 				<< string(20, char(196)) << char(193)
 				<< string(10, char(196)) << char(217) << endl;
-		gotoxy(49,18);
+		gotoxy(49,19);
         cout<<"("<<currentPage<<"/"<<numPage<<")"<<endl;
-        gotoxy(0, 19);
+        gotoxy(0, 20);
         cout << "A: Them | D: Xoa | E: Sua | C: Xem Diem | S: luu | Q: Thoat" << endl;
-        for(int i = mouse; i< mouse + 10; i++){
-            gotoxy(0,i);
-            clearCurrentLine();
-        }
+
         a = toupper(getch());
         if (a == -32 || a == 0) { // phím đặc biệt
             a = getch();
@@ -513,6 +503,7 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, nodeSinhVien* &head){
                     suaSV(head, dsLop);
                     break;
                 case 'C':   //Xem Diem
+                    xemDiem(lop, dsMonHoc);
                     break;
                 case 'S':
                     GhiDanhSachLop(dsLop, "Lop.txt");

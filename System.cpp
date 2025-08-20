@@ -83,11 +83,11 @@ nodeSinhVien* timSinhVien(DanhSachLop&dsLop, char* MSV){
     return NULL;
 }
 
-bool SystemGV(DanhSachLop &dsLop, int chon, int item){
+bool SystemGV(DanhSachLop &dsLop, ListMonHoc &dsMH, int chon, int item){
     while (true) {
         switch (chon){
             case 1:
-                if (hienthidanhsachLop(dsLop)) {
+                if (hienthidanhsachLop(dsLop, dsMH)) {
                     chon = UIMenu(menu, item);  // Gọi lại menu nếu người dùng thoát
                     continue;
                 }
@@ -190,7 +190,7 @@ void login(DanhSachLop& dsLop, ListMonHoc& dsMH) {
                     int item = sizeof(menu)/sizeof(menu[0]);
                     int chon = UIMenu(menu,item);
                     // int chon = MenuDong(thucdon);
-                    bool quayLaiLogin = SystemGV(dsLop, chon, item);
+                    bool quayLaiLogin = SystemGV(dsLop, dsMH, chon, item);
                     if (quayLaiLogin) break; // quay lại giao diện đăng nhập
                 }
                 continue; // tiếp tục vòng login từ đầu

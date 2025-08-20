@@ -5,6 +5,7 @@
 #include "CTDL.h"
 #include "ChuanHoa.h"
 #include "file_lop.h"
+#include "GiaoDienXemDiem.h"
 #include "mylib.h"
 #include <cstring>
 #include <iomanip>
@@ -247,14 +248,6 @@ void BatDauThi(nodeDiemThi* &bt, int minute){
     gotoxy(7,2); cout<<dapanDung<<"/"<<bt->diem.baithi->n;
     bt->diem.Diem = diem;
 };
-
-// ham tim mon hoc, neu tim duoc -> tra ve vi tri, neu khong -> tra ve -1;
-int timMonHoc(ListMonHoc &dsMH, char* mmh){
-    for(int i = 0; i < dsMH.n && strcmp(dsMH.list[i].MAMH, mmh) <= 0; i++){
-        if(strcmp(dsMH.list[i].MAMH, mmh) == 0) return i;
-    }
-    return -1;
-}
 
 void chuanBiThi(nodeSinhVien* &sv, DanhSachLop &dsLop, ListMonHoc &dsMH){
     Normal();clrscr();
