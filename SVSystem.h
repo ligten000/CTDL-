@@ -244,8 +244,8 @@ void BatDauThi(nodeDiemThi* &bt, int minute){
             dapanDung++;
     }
     diem = (float(dapanDung)/float(bt->diem.baithi->n))*10;
-    gotoxy(10,1); cout<<diem;
-    gotoxy(7,2); cout<<dapanDung<<"/"<<bt->diem.baithi->n;
+    gotoxy(10,1); cout<<formatDiem(diem);
+    gotoxy(10,2); cout<<dapanDung<<"/"<<bt->diem.baithi->n;
     bt->diem.Diem = diem;
 };
 
@@ -320,6 +320,60 @@ void chuanBiThi(nodeSinhVien* &sv, DanhSachLop &dsLop, ListMonHoc &dsMH){
             return;
         }
     }
+}
+
+void nhapMK(char* MK, int x, int y){
+    while(true){
+        gotoxy(x,y);
+        NhapPwd(MK, 19);
+        if(strlen(MK) == 0){
+            thongBaoLoi("Khong duoc de trong!", x,y);
+            continue;
+        }
+        break;
+    }
+    return;
+}
+
+void DoiMatKhau(DanhSachLop& dsLop, nodeSinhVien*& sv){
+    Normal();clrscr();
+    char MKC[20]; // 20 ký tự + '\0'
+    char MKM[20];
+    gotoxy(0,0);
+    cout<<"Mat khau cu :";
+    gotoxy(0,1);
+    cout<<"Mat khau moi:";
+    nhapMK(MKC,14,0);
+    nhapMK(MKM,14,1);
+    char ch;
+    while(strcmp(MKC, sv->sv.Password) != 0){
+        thongBaoLoi("Mat khau cu khong dung", 0, 3);
+        gotoxy(0,3);
+        cout<<"Co muon nhap lai khong!(Y/N)";
+        while(true){
+            ch = toupper(getch());
+            if(ch == 'Y'){
+                clearLine(0,3, 100);
+                nhapMK(MKC,14,0);
+                break;
+            }
+            if(ch == 'N') return;
+        }
+
+    }
+    gotoxy(0,3);
+    cout<<"Co chac muon doi mat khau khong!(Y/N)";
+    while(true){
+        ch = toupper(getch());
+        if(ch == 'Y'){
+            clearLine(0,3, 100);
+            strcpy(sv->sv.Password, MKM);
+            GhiDanhSachLop(dsLop,"Lop.txt");
+            break;
+        }
+        if(ch == 'N') break;
+    }
+    return;
 }
 
 #endif

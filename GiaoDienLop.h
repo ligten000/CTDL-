@@ -24,6 +24,38 @@ int timSV(DanhSachLop& dsLop,char* MSV){
     return 0;
 }
 
+void inDanhSachSV(nodeSinhVien* head, int start, int end){
+    gotoxy(0, 4);
+		int index = 0;
+        nodeSinhVien* p = head;
+        while (p != NULL && index < end) {
+            if (index >= start) {
+                cout << char(179) << setw(10) << left << index + 1 
+                    << char(179) << setw(20) << left << p->sv.MASV
+                    << char(179) << setw(40) << left << p->sv.HO
+                    << char(179) << setw(20) << left << p->sv.TEN
+                    << char(179) << setw(10) << left << p->sv.PHAI
+                    << char(179) << endl;
+            }
+            p = p->next;
+            index++;
+        }
+        for(int i = end+1; i<= start + Page_Size; i++){
+			cout 	<< char(179) << setw(10) << left << i
+					<< char(179) << setw(20) << left << ""
+					<< char(179) << setw(40) << left << ""
+					<< char(179) << setw(20) << left << ""
+					<< char(179) << setw(10) << left << ""
+					<< char(179) << endl;
+        }
+		// Vẽ đường phân cách tiêu đề và dữ liệu
+		cout << char(192) << string(10, char(196)) << char(193)
+				<< string(20, char(196)) << char(193)
+				<< string(40, char(196)) << char(193)
+				<< string(20, char(196)) << char(193)
+				<< string(10, char(196)) << char(217) << endl;
+}
+
 void chenSV(nodeSinhVien*& head, nodeSinhVien* a) {
     a->next = NULL;
 
@@ -145,6 +177,7 @@ void xoaSV(nodeSinhVien* &head){
     cout<<"Nhap ma sinh vien muon xoa";
     gotoxy(0,mouse + 1);
     cout<<"MSV:";
+    char ch;
     while(true){
         gotoxy(5, mouse + 1);
         NhapMa(MSV, 10);
@@ -164,9 +197,22 @@ void xoaSV(nodeSinhVien* &head){
         }
         if(p->sv.dsDiemThi != NULL){
             thongBaoLoi("Sinh vien nay da co diem thi, khong the xoa", 0, mouse + 2);
+            gotoxy(0,mouse +2);   
+            cout<<"Ban co muon thuc hien lai thao tac khong?(Y/N)";
+            while(true){
+                ch = toupper(getch());
+                if(ch == 'Y'){
+                        clearLine(0,mouse + 1,10);
+                        clearLine(0,mouse + 2,100);
+                        break;
+                    }
+                if(ch == 'N'){
+                    thongBaoLoi("Huy thao tac!", 0,mouse +3);
+                    return;
+                }
+            }
             continue;
         }
-        char ch;
         gotoxy(0, mouse + 2);
         cout<<"Ban co chac muon xoa sinh vien nay?(Y/N)";
         while(true){
@@ -221,10 +267,10 @@ bool NhapTruong(char* field, int maxLen, int x, int y) {
 
 struct Field {
     string label;
-    char* value;
+    char value[50];
 };
 
-void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
+void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop, int start, int end){
     if(head == NULL){
         thongBaoLoi("Lop chua co sinh vien", 0, mouse );
         return;
@@ -238,7 +284,7 @@ void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
     gotoxy(0,mouse + 1);
     cout<<"MSV:";
     nodeSinhVien* sua;
-    nodeSinhVien* pre = nullptr;;
+    nodeSinhVien* pre = nullptr;
     int currentLine = 1;
     while(true){
         gotoxy(5, mouse + 1);
@@ -247,8 +293,7 @@ void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
             thongBaoLoi("Ma sinh vien trong!", 5, mouse + 1);
             continue;
         }
-        for( sua = head; sua != NULL && strcmp(MSV, sua->sv.MASV) >=0; sua = sua->next){
-            if(strcmp(MSV, sua->sv.MASV) ==0) break;
+        for( sua = head; sua != NULL && strcmp(MSV, sua->sv.MASV) > 0; sua = sua->next){
             pre = sua;
         }
         if(sua == NULL || strcmp(MSV, sua->sv.MASV) != 0){
@@ -257,12 +302,15 @@ void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
         }
         break;
     }
-    Field fields[4] = {
-        {"MSV", sua->sv.MASV},
-        {"Ho & ten dem", sua->sv.HO},
-        {"Ten", sua->sv.TEN},
-        {"Gioi tinh", sua->sv.PHAI}
-    };
+    Field fields[4] = { {"MSV", ""},
+                        {"Ho & ten dem", ""},
+                        {"Ten", ""},
+                        {"Gioi tinh", ""}
+                    };
+    strcpy(fields[0].value, sua->sv.MASV);
+    strcpy(fields[1].value, sua->sv.HO);
+    strcpy(fields[2].value, sua->sv.TEN);
+    strcpy(fields[3].value, sua->sv.PHAI);
     gotoxy(0, mouse);
     cout<<"Thong tin sinh vien (ENTER de sua, ESC de thoat, S de luu thay doi)";
     for (int i = 0; i < 4; i++) {
@@ -362,22 +410,34 @@ void suaSV(nodeSinhVien*& head, DanhSachLop &dsLop){
                 if(notSaved == false) return;
             }
             if(a == 'S'){
-                notSaved = false;
-                
-                strcpy(sua->sv.HO, fields[1].value);
-                strcpy(sua->sv.TEN, fields[2].value);
-                strcpy(sua->sv.PHAI, fields[3].value);
-                if(strcmp(sua->sv.MASV, fields[0].value) != 0){
-                    strcpy(sua->sv.MASV, fields[0].value);
-                    if (sua == head) {
-                    head = sua->next;
-                    } else {
-                        pre->next = sua->next;
+                gotoxy(0,mouse +5);
+                cout << "Ban co chac muon luu thay doi khong? (Y/N): ";
+                while (true) {
+                    a = toupper(getch());
+                    if (a == 'Y') {
+                        notSaved = false;
+                        strcpy(sua->sv.HO, fields[1].value);
+                        strcpy(sua->sv.TEN, fields[2].value);
+                        strcpy(sua->sv.PHAI, fields[3].value);
+                        if(strcmp(sua->sv.MASV, fields[0].value) != 0){
+                            strcpy(sua->sv.MASV, fields[0].value);
+                            if (sua == head) {
+                            head = sua->next;
+                            } else {
+                                pre->next = sua->next;
+                            }
+                            chenSV(head, sua);
+                        }
+                        inDanhSachSV(head, start, end);
+                        GhiDanhSachLop(dsLop, "Lop.txt");
+                        thongBaoLoi("Luu thanh cong", 0, mouse + 6);
+                        clearLine(0,mouse + 5, 100);
+                        break;
+                    } else if (a == 'N') {
+                        clearLine(0,mouse + 5, 100);
+                        break;
                     }
-                    chenSV(head, sua);
-                }
-                
-                GhiDanhSachLop(dsLop, "Lop.txt");
+                }  
             }
         }
     }
@@ -407,6 +467,8 @@ void IntieuDeDSLop(){
         gotoxy(0, 18);
         cout << "A: Them | D: Xoa | E: Sua | C: Chon | S: luu | Q: Thoat" << endl;
 }
+
+
 
 void HienThiDanhSachSinhVien(DanhSachLop &dsLop, Lop* &lop, ListMonHoc &dsMonHoc){
     char a;
@@ -449,35 +511,36 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, Lop* &lop, ListMonHoc &dsMonHoc
                 << string(20, char(196)) << char(197)
                 << string(10, char(196)) << char(180) << endl;
 
-		gotoxy(0, 4);
-		int index = 0;
-        nodeSinhVien* p = head;
-        while (p != NULL && index < end) {
-            if (index >= start) {
-                cout << char(179) << setw(10) << left << index + 1 
-                    << char(179) << setw(20) << left << p->sv.MASV
-                    << char(179) << setw(40) << left << p->sv.HO
-                    << char(179) << setw(20) << left << p->sv.TEN
-                    << char(179) << setw(10) << left << p->sv.PHAI
-                    << char(179) << endl;
-            }
-            p = p->next;
-            index++;
-        }
-        for(int i = end+1; i<= start + Page_Size; i++){
-			cout 	<< char(179) << setw(10) << left << i
-					<< char(179) << setw(20) << left << ""
-					<< char(179) << setw(40) << left << ""
-					<< char(179) << setw(20) << left << ""
-					<< char(179) << setw(10) << left << ""
-					<< char(179) << endl;
-        }
-		// Vẽ đường phân cách tiêu đề và dữ liệu
-		cout << char(192) << string(10, char(196)) << char(193)
-				<< string(20, char(196)) << char(193)
-				<< string(40, char(196)) << char(193)
-				<< string(20, char(196)) << char(193)
-				<< string(10, char(196)) << char(217) << endl;
+		// gotoxy(0, 4);
+		// int index = 0;
+        // nodeSinhVien* p = head;
+        // while (p != NULL && index < end) {
+        //     if (index >= start) {
+        //         cout << char(179) << setw(10) << left << index + 1 
+        //             << char(179) << setw(20) << left << p->sv.MASV
+        //             << char(179) << setw(40) << left << p->sv.HO
+        //             << char(179) << setw(20) << left << p->sv.TEN
+        //             << char(179) << setw(10) << left << p->sv.PHAI
+        //             << char(179) << endl;
+        //     }
+        //     p = p->next;
+        //     index++;
+        // }
+        // for(int i = end+1; i<= start + Page_Size; i++){
+		// 	cout 	<< char(179) << setw(10) << left << i
+		// 			<< char(179) << setw(20) << left << ""
+		// 			<< char(179) << setw(40) << left << ""
+		// 			<< char(179) << setw(20) << left << ""
+		// 			<< char(179) << setw(10) << left << ""
+		// 			<< char(179) << endl;
+        // }
+		// // Vẽ đường phân cách tiêu đề và dữ liệu
+		// cout << char(192) << string(10, char(196)) << char(193)
+		// 		<< string(20, char(196)) << char(193)
+		// 		<< string(40, char(196)) << char(193)
+		// 		<< string(20, char(196)) << char(193)
+		// 		<< string(10, char(196)) << char(217) << endl;
+        inDanhSachSV(head,start, end);
 		gotoxy(49,19);
         cout<<"("<<currentPage<<"/"<<numPage<<")"<<endl;
         gotoxy(0, 20);
@@ -500,7 +563,7 @@ void HienThiDanhSachSinhVien(DanhSachLop &dsLop, Lop* &lop, ListMonHoc &dsMonHoc
                     slSV = demSinhVien(head);
                     break;
                 case 'E':   // Sửa SV
-                    suaSV(head, dsLop);
+                    suaSV(head, dsLop, start, end);
                     break;
                 case 'C':   //Xem Diem
                     xemDiem(lop, dsMonHoc);

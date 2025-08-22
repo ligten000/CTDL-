@@ -62,8 +62,8 @@ void ChiTietBaiThi(nodeSinhVien*&SV, nodeDiemThi* diem){
         cout<<"B. "<<diem->diem.baithi->dsBaithichitiet[currentQ].cauhoi->data.B<<endl;
         cout<<"C. "<<diem->diem.baithi->dsBaithichitiet[currentQ].cauhoi->data.C<<endl;
         cout<<"D. "<<diem->diem.baithi->dsBaithichitiet[currentQ].cauhoi->data.D<<endl;
-        cout<<"Dap an : "<<diem->diem.baithi->dsBaithichitiet[currentQ].traloi<<endl;
-        cout<<"Tra loi: "<<diem->diem.baithi->dsBaithichitiet[currentQ].cauhoi->data.DapAn<<endl;
+        cout<<"Tra loi: "<<diem->diem.baithi->dsBaithichitiet[currentQ].traloi<<endl;
+        cout<<"Dap an : "<<diem->diem.baithi->dsBaithichitiet[currentQ].cauhoi->data.DapAn<<endl;
          a = toupper(getch());
         if (a == -32 || a == 0) { // phím đặc biệt
             a = getch();

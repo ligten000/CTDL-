@@ -150,6 +150,38 @@ void NhapSo(char ma[], int n) {
     cout << endl;
 }
 
+void NhapPwd(char ma[], int n){
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+
+            if ((c >= 'A' && c <= 'Z')|| (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '_' ) {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << '*';
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
 int ChuoiThanhSo(const char ma[]) {
     int num = 0;
     for (int i = 0; ma[i] != '\0'; i++) {

@@ -20,7 +20,7 @@ char* menu[] = {"Quan ly danh sach lop",
                 "Thoat chuong trinh"};
 
 char * menuSV[] = { "Bat dau thi",
-                    "Xem diem",
+                    "Doi mat khau",
                     "Thoat chuong trinh"};                      
 
 
@@ -115,8 +115,10 @@ bool SystemSV(nodeSinhVien* &sv, DanhSachLop& dsLop,ListMonHoc &dsMH, int chon, 
             case 1:
                 chuanBiThi(sv, dsLop, dsMH);
                 chon = UIMenu(menuSV, item);
+                break;
             case 2:
-                // các chức năng khác
+                DoiMatKhau(dsLop, sv);
+                chon = UIMenu(menuSV, item);
                 break;
             case 3:
                 return true;  // Thoát luôn SystemGV (nếu muốn vậy)
