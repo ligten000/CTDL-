@@ -1,18 +1,165 @@
-
+#ifndef MYLIB_H
+#define MYLIB_H
 #include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dos.h>
 #include <string.h>
 #include <windows.h>
+#include <sstream> 
+#include <iomanip> 
+using namespace std;
 
 #define Enter 13
 //const int WHITE=15;
 #define PASSWORD "abcdef"
 //const int WHITE=15;
 
-char* Pwd () {
-     char S[40]; int i=0;
+
+string formatDiem(float d) {
+    ostringstream oss;
+    oss << fixed << setprecision(1) << d;
+    return oss.str();
+}
+
+void NhapMa(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+void NhapChuoi(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c== ' ') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+void NhapTen(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= 'A' && c <= 'Z') || c== ' ') {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+void NhapSo(char ma[], int n) {
+    int i = 0;
+    char c;
+    while (true) {
+        c = getch();
+
+        // Enter
+        if (c == 13) break;
+
+        // Backspace
+        if (c == 8) {
+            if (i > 0) {
+                i--;
+                cout << "\b \b";
+            }
+        }
+        // Ký tự hợp lệ
+        else {
+            c = toupper(c);
+            if ((c >= '0' && c <= '9')) {
+                if (i < n) {
+                    ma[i++] = c;
+                    cout << c;
+                }
+            }
+        }
+    }
+
+    ma[i] = '\0'; 
+    cout << endl;
+}
+
+int ChuoiThanhSo(const char ma[]) {
+    int num = 0;
+    for (int i = 0; ma[i] != '\0'; i++) {
+        num = num * 10 + (ma[i] - '0');
+    }
+    return num;
+}
+
+char* Pwd (char S[40]) {
+     int i=0;
      while ((S[i]= getch()) != Enter ) 
      { printf ("%c", '*') ; i++ ; 
      }
@@ -24,8 +171,9 @@ int CheckPwd () {
     int dem =0; 
     for ( dem =1 ; dem <=3 ; dem++)
     { printf( "Password :"); 
-      if (strcmp(Pwd(),PASSWORD) ==0)   return 1;
-      else printf ( "\nPassword sai. Hay nhap lai\n")  ; 
+        char S[40];
+        if (strcmp(Pwd(S),PASSWORD) ==0)   return 1;
+        else printf ( "\nPassword sai. Hay nhap lai\n")  ; 
     }
     return 0;  
 }
@@ -37,7 +185,23 @@ void gotoxy(short x,short y)
         hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleCursorPosition(hConsoleOutput , Cursor_an_Pos);
 }  
+void clearLine(int x, int y, int length) {
+    gotoxy(x, y);
+    for (int i = 0; i < length; i++) std:: cout << ' ';
+    gotoxy(x, y);
+}
 
+void clearCurrentLine() {
+    cout << "\r\033[K";
+}
+
+void thongBaoLoi(const char* msg, int x, int y) {
+    gotoxy(x, y);
+    cout << msg;
+    Sleep(1000);
+    clearLine(x, y, strlen(msg));  // Xóa thông báo lỗi
+    gotoxy(x, y);
+}
 int wherex( void )
 {
     HANDLE hConsoleOutput;
@@ -101,3 +265,13 @@ void SetBGColor(WORD color)
 void clrscr() {
 	system("cls");
 }
+
+void Normal () {
+	SetColor(15);
+	SetBGColor(0);
+}
+void HighLight () {
+	SetColor(15);
+	SetBGColor(1);
+}
+#endif 

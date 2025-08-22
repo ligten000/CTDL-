@@ -5,91 +5,132 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+<<<<<<< HEAD
+=======
+#include <unordered_set>
+>>>>>>> main
 #include "CTDL.h"
+
 using namespace std;
 
-// Ghi 1 cây câu hỏi theo thứ tự NLR (preorder)
-void GhiCayCauHoi(ofstream &fo, nodeCauhoi *root) {
+// Ghi 1 môn học
+static inline void GhiMonHoc(ofstream &fo, const MonHoc &mh) {
+	fo << "MONHOC|" << mh.MAMH << "|" << mh.TENMH << '\n';
+}
+
+// Ghi 1 cây câu hỏi theo NLR (preorder)
+static void GhiCayCauHoi(ofstream &fo, nodeCauhoi *root) {
     if (root == NULL) return;
-    // Ghi 1 câu hỏi trên 1 dòng
-    fo << root->data.Id << "|" << root->data.NoiDung << "|"
-       << root->data.A << "|" << root->data.B << "|" << root->data.C << "|" << root->data.D << "|" << root->data.DapAn << endl;
+	const CauHoi &ch = root->data;
+	fo << "CAUHOI|"
+	   << ch.Id << "|" << ch.NoiDung << "|"
+	   << ch.A << "|" << ch.B << "|" << ch.C << "|" << ch.D << "|"
+	   << ch.DapAn << "|" << ch.trangthai << '\n';
     GhiCayCauHoi(fo, root->left);
     GhiCayCauHoi(fo, root->right);
 }
 
-// Đếm số lượng node trong cây
-int DemSoCauHoi(nodeCauhoi *root) {
-    if (root == NULL) return 0;
-    return 1 + DemSoCauHoi(root->left) + DemSoCauHoi(root->right);
-}
-
-// Ghi toàn bộ danh sách môn học và cây câu hỏi ra file TXT
-void GhiFileDSMonHoc(const ListMonHoc &ds, const char* filename) {
+// API ghi file theo định dạng mới
+inline void GhiFile(const ListMonHoc &dsMH, const char* filename) {
     ofstream fo(filename);
     if (!fo.is_open()) return;
-    fo << ds.n << endl;
-    for (int i = 0; i < ds.n; ++i) {
-        int socau = DemSoCauHoi(ds.list[i].treeCauHoi);
-        fo << ds.list[i].MAMH << "|" << ds.list[i].TENMH << "|" << socau << endl;
-        GhiCayCauHoi(fo, ds.list[i].treeCauHoi);
-    }
-    fo << "END" << endl;
+	for (int i = 0; i < dsMH.n; ++i) {
+		GhiMonHoc(fo, dsMH.list[i]);
+		GhiCayCauHoi(fo, dsMH.list[i].treeCauHoi);
+	}
     fo.close();
 }
 
-// Chèn 1 câu hỏi vào cây nhị phân tìm kiếm theo Id (dạng số nguyên)
-void ChenCauHoiVaoCay(nodeCauhoi* &root, const CauHoi &ch) {
-    if (root == NULL) {
-        root = new nodeCauhoi{ch, true, NULL, NULL};
-        return;
-    }
-    int id_new = atoi(ch.Id);
-    int id_cur = atoi(root->data.Id);
-    if (id_new < id_cur) ChenCauHoiVaoCay(root->left, ch);
-    else ChenCauHoiVaoCay(root->right, ch);
+// Tạo node mới từ CauHoi
+static nodeCauhoi* TaoNode(const CauHoi &ch) {
+	nodeCauhoi* p = new nodeCauhoi;
+	p->data = ch;
+	p->left = NULL;
+	p->right = NULL;
+	return p;
 }
 
-// Đọc 1 cây câu hỏi từ file (số lượng node đã biết)
-void DocCayCauHoi(ifstream &fi, nodeCauhoi* &root, int socau) {
-    for (int i = 0; i < socau; ++i) {
-        string line;
-        if (!getline(fi, line)) break;
-        stringstream ss(line);
-        CauHoi ch;
-        string tmp;
-        getline(ss, tmp, '|'); strncpy(ch.Id, tmp.c_str(), 15); ch.Id[15] = '\0';
-        getline(ss, ch.NoiDung, '|');
-        getline(ss, tmp, '|'); strncpy(ch.A, tmp.c_str(), 127); ch.A[127] = '\0';
-        getline(ss, tmp, '|'); strncpy(ch.B, tmp.c_str(), 127); ch.B[127] = '\0';
-        getline(ss, tmp, '|'); strncpy(ch.C, tmp.c_str(), 127); ch.C[127] = '\0';
-        getline(ss, tmp, '|'); strncpy(ch.D, tmp.c_str(), 127); ch.D[127] = '\0';
-        getline(ss, tmp, '|'); ch.DapAn = tmp.empty() ? 'A' : tmp[0];
-        ChenCauHoiVaoCay(root, ch);
-    }
+// Chèn vào BST theo so sánh chuỗi Id (lexicographical)
+static void ChenCauHoiTheoId(nodeCauhoi* &root, const CauHoi &ch) {
+	if (root == NULL) { root = TaoNode(ch); return; }
+	int cmp = strcmp(ch.Id, root->data.Id);
+	if (cmp < 0) ChenCauHoiTheoId(root->left, ch);
+	else if (cmp > 0) ChenCauHoiTheoId(root->right, ch);
+	else {
+		// Id trùng trên cùng cây -> bỏ qua để đảm bảo duy nhất
+	}
 }
 
-// Đọc toàn bộ danh sách môn học và cây câu hỏi từ file TXT
-void DocFileDSMonHoc(ListMonHoc &ds, const char* filename) {
+// Đọc dòng MONHOC và thêm vào danh sách
+static void DocMonHoc(const string &line, ListMonHoc &dsMH) {
+	// line: MONHOC|MAMH|TENMH
+	stringstream ss(line);
+	string prefix, mamh, tenmh;
+	getline(ss, prefix, '|');
+	getline(ss, mamh, '|');
+	getline(ss, tenmh);
+	if (dsMH.n >= MAX_ListMH) return;
+	MonHoc &mh = dsMH.list[dsMH.n++];
+	strncpy(mh.MAMH, mamh.c_str(), sizeof(mh.MAMH)-1); mh.MAMH[sizeof(mh.MAMH)-1] = '\0';
+	strncpy(mh.TENMH, tenmh.c_str(), sizeof(mh.TENMH)-1); mh.TENMH[sizeof(mh.TENMH)-1] = '\0';
+	mh.treeCauHoi = NULL;
+}
+
+// Đọc dòng CAUHOI và chèn vào treeCauHoi của môn hiện tại
+static void DocCauHoi(const string &line, MonHoc *monHienTai, unordered_set<string> &idSet) {
+	// line: CAUHOI|ID|NOIDUNG|A|B|C|D|DAPAN|TRANGTHAI
+	if (monHienTai == NULL) return; // Không có MONHOC trước đó
+	stringstream ss(line);
+	string prefix, id, nd, A, B, C, D, dapAnStr, ttStr;
+	getline(ss, prefix, '|');
+	getline(ss, id, '|');
+	getline(ss, nd, '|');
+	getline(ss, A, '|');
+	getline(ss, B, '|');
+	getline(ss, C, '|');
+	getline(ss, D, '|');
+	getline(ss, dapAnStr, '|');
+	getline(ss, ttStr);
+	if (id.empty()) return;
+	// Đảm bảo ID duy nhất toàn hệ thống
+	if (idSet.find(id) != idSet.end()) return; // bỏ qua bản ghi trùng
+	idSet.insert(id);
+	CauHoi ch{};
+	strncpy(ch.Id, id.c_str(), sizeof(ch.Id)-1); ch.Id[sizeof(ch.Id)-1] = '\0';
+	ch.NoiDung = nd;
+	strncpy(ch.A, A.c_str(), sizeof(ch.A)-1); ch.A[sizeof(ch.A)-1] = '\0';
+	strncpy(ch.B, B.c_str(), sizeof(ch.B)-1); ch.B[sizeof(ch.B)-1] = '\0';
+	strncpy(ch.C, C.c_str(), sizeof(ch.C)-1); ch.C[sizeof(ch.C)-1] = '\0';
+	strncpy(ch.D, D.c_str(), sizeof(ch.D)-1); ch.D[sizeof(ch.D)-1] = '\0';
+	ch.DapAn = dapAnStr.empty() ? 'A' : static_cast<char>(toupper(dapAnStr[0]));
+	ch.trangthai = ttStr.empty() ? 0 : atoi(ttStr.c_str());
+	ChenCauHoiTheoId(monHienTai->treeCauHoi, ch);
+}
+
+// API đọc file theo định dạng mới
+inline void DocFile(ListMonHoc &dsMH, const char* filename) {
     ifstream fi(filename);
     if (!fi.is_open()) return;
+	// Khởi tạo lại danh sách (không giải phóng bộ nhớ cũ ở đây)
+	dsMH.n = 0;
+	for (int i = 0; i < MAX_ListMH; ++i) {
+		// không bắt buộc xóa cây cũ ở đây
+	}
     string line;
-    getline(fi, line);
-    ds.n = stoi(line);
-    for (int i = 0; i < ds.n; ++i) {
-        if (!getline(fi, line)) break;
-        stringstream ss(line);
-        string tmp;
-        getline(ss, tmp, '|'); strncpy(ds.list[i].MAMH, tmp.c_str(), 15); ds.list[i].MAMH[15] = '\0';
-        getline(ss, tmp, '|'); strncpy(ds.list[i].TENMH, tmp.c_str(), 49); ds.list[i].TENMH[49] = '\0';
-        getline(ss, tmp, '|'); int socau = stoi(tmp);
-        ds.list[i].treeCauHoi = NULL;
-        DocCayCauHoi(fi, ds.list[i].treeCauHoi, socau);
-    }
-    // Đọc END
-    getline(fi, line);
+	MonHoc *monHienTai = NULL;
+	unordered_set<string> idSet; // theo dõi Id duy nhất
+	while (getline(fi, line)) {
+		if (line.rfind("MONHOC|", 0) == 0) {
+			DocMonHoc(line, dsMH);
+			monHienTai = &dsMH.list[dsMH.n - 1];
+		} else if (line.rfind("CAUHOI|", 0) == 0) {
+			DocCauHoi(line, monHienTai, idSet);
+		} else {
+			// dòng trống hoặc không hợp lệ -> bỏ qua
+		}
+	}
     fi.close();
+    cout<<"read file complete!"<<endl;
 }
-
 
 #endif // FILE_CAUHOI_H 

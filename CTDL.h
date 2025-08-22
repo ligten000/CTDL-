@@ -8,12 +8,14 @@ struct CauHoi {
     string NoiDung;
     char A[128], B[128], C[128], D[128];
     char DapAn;
+    int trangthai;
 } ;
 
 struct nodeCauhoi{
     CauHoi data;
-    bool trangthai;
-    nodeCauhoi *left, *right;
+    
+    nodeCauhoi *left = NULL;
+    nodeCauhoi *right = NULL;
 };
 
 
@@ -26,25 +28,26 @@ struct MonHoc {
 // Môn học (Danh sách tuyến tính)
 const int MAX_ListMH = 500;
 struct ListMonHoc{
-    int n;
+    int n = 0;
     MonHoc list[MAX_ListMH];
 };
 
-struct BaiThiChiTiet
+struct BaiThiChiTiets
 {
-    char idcauhoi[16];
+    nodeCauhoi * cauhoi;
     char traloi;
 };
 
-struct nodeBaithi{
-    BaiThiChiTiet btct;
-    nodeBaithi* next;
+struct Baithi{
+    int n = 0;
+    BaiThiChiTiets* dsBaithichitiet = NULL;
 };
+
 
 struct DiemThi {
     char MAMH[16];
     float Diem;
-    nodeBaithi *baithi = NULL;
+    Baithi *baithi = NULL;
 };
 
 // Điểm thi (Danh sách liên kết đơn)
@@ -60,22 +63,24 @@ struct SinhVien {
 };
 
 // Sinh viên (Danh sách liên kết đơn)
-struct nodeSinhvien 
+struct nodeSinhVien
 {
    SinhVien sv;
-   nodeSinhvien *next;
+   nodeSinhVien *next = NULL;
 };
+
 
 struct Lop {
     char MALOP[15], TENLOP[50];
-    nodeSinhvien * listSV = NULL;
+    nodeSinhVien *listSV = NULL;
 };
 
 // Lớp (Mảng con trỏ)
 const int Max_lop = 100;
 struct DanhSachLop
 {
-    int n;
+    int n = 0;
     Lop* lop[Max_lop];
 };
+
 #endif
