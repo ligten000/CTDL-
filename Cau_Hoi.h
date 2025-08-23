@@ -8,6 +8,9 @@
 #include "CTDL.h"
 using namespace std;
 
+// Forward declaration
+nodeCauhoi* timCauHoiTheoId(nodeCauhoi* root, const char* id);
+
 
 // Hàm kiểm tra dữ liệu câu hỏi có hợp lệ không
 bool KiemTraHopLeCauHoi(const char* noiDung, const char* A, const char* B, const char* C, const char* D, char dapAn) {
@@ -105,36 +108,156 @@ bool KiemTraTrungID(const ListMonHoc& dsMH, const char* id) {
     return KiemTraTrungIDTrongCay(dsMH.list[indexMonHoc].treeCauHoi, id);
 }
 
-// Hàm sinh ID duy nhất cho câu hỏi mới
-// Định dạng: <MAMH><NNN>
-// MAMH: mã môn học (ví dụ CTDL, OOP)
-// NNN: số có 3 chữ số từ 000 đến 999 ngẫu nhiên
-// Duy nhất toàn hệ thống
-char* sinhID(const char* maMon, const ListMonHoc& dsMH) {
-    if (maMon == NULL || strlen(maMon) == 0) {
-        return NULL;
-    }
-    
+// Sửa sinhID: không cần dsMH, giữ ngẫu nhiên
+char* sinhID(const char* maMon, MonHoc &mh) {
+    if (maMon == NULL || strlen(maMon) == 0) return NULL;
     static char idMoi[16];
-    int dem = 0;
-    
-    // Thử tối đa 1000 lần để tìm ID duy nhất
-    while (dem < 1000) {
-        // Sinh số ngẫu nhiên từ 000-999
-        srand(time(0) + rand() + dem); // Tăng tính ngẫu nhiên
-        int nnn = rand() % 1000;
-        
-        // Tạo ID với định dạng: MAMH + NNN
-        sprintf(idMoi, "%s%03d", maMon, nnn);
-        
-        // Kiểm tra ID đã tồn tại trong toàn hệ thống chưa
-        if (!KiemTraTrungID(dsMH, idMoi)) {
-            return idMoi; // Tìm thấy ID duy nhất
-        }
-        dem++;
+    int attempts = 0;
+    const int MAX_ATTEMPTS = 50; // Giới hạn thử vì n ≤ 1000
+    int newNum;
+    do {
+        newNum = rand() % 1000; // Random 000-999
+        sprintf(idMoi, "%s%03d", maMon, newNum); // Format 3 chữ số
+        attempts++;
+    } while (timCauHoiTheoId(mh.treeCauHoi, idMoi) != NULL && attempts < MAX_ATTEMPTS);
+    if (attempts >= MAX_ATTEMPTS) return NULL; // Hết ID hoặc lỗi
+    if (newNum > mh.maxID) mh.maxID = newNum; // Cập nhật maxID
+    return idMoi;
+}
+
+
+
+// Dem so node trong cay (duyet in-order khong de quy)
+inline int demNodeCauHoi(nodeCauhoi* root) {
+    int count = 0;
+    if (root == NULL) return 0;
+    const int MAX_STACK = 8192;
+    nodeCauhoi* stack[MAX_STACK]; int top = -1; nodeCauhoi* curr = root;
+    while (curr != NULL || top >= 0) {
+        while (curr != NULL) { if (top < MAX_STACK - 1) stack[++top] = curr; curr = curr->left; }
+        curr = stack[top--];
+        ++count;
+        curr = curr->right;
     }
+    return count;
+}
+
+// Tim ID lon nhat (phan so sau MAMH) trong cay
+inline void inorderTimMax(nodeCauhoi* root, int &maxID) {
+    if (root == NULL) return;
+    const int MAX_STACK = 8192;
+    nodeCauhoi* stack[MAX_STACK]; int top = -1; nodeCauhoi* curr = root;
+    while (curr != NULL || top >= 0) {
+        while (curr != NULL) { if (top < MAX_STACK - 1) stack[++top] = curr; curr = curr->left; }
+        curr = stack[top--];
+        // Tach phan so tu Id
+        const char* id = curr->data.Id;
+        int pos = 0; while (id[pos] && !isdigit(id[pos])) pos++;
+        int num = 0; if (id[pos]) num = atoi(id + pos);
+        if (num > maxID) maxID = num;
+        curr = curr->right;
+    }
+}
+
+// Sinh ID moi theo thu tu: lon nhat + 1
+// Hàm này đã bị loại bỏ, thay thế bằng sinhID ngẫu nhiên
+// inline char* sinhID_TuanTu(const char* maMon, nodeCauhoi* root) {
+//     static char buffer[16];
+//     if (maMon == NULL || strlen(maMon) == 0) return NULL;
+//     int maxID = 0;
+//     inorderTimMax(root, maxID);
+//     sprintf(buffer, "%s%03d", maMon, maxID + 1);
+//     return buffer;
+// }
+
+// Chuyen inorder sang mang (khong dung vector)
+inline void inorderToArray(nodeCauhoi* root, CauHoi* outArr, int n) {
+    if (root == NULL || outArr == NULL || n <= 0) return;
+    const int MAX_STACK = 8192;
+    nodeCauhoi* stack[MAX_STACK]; int top = -1; nodeCauhoi* curr = root; int idx = 0;
+    while (curr != NULL || top >= 0) {
+        while (curr != NULL) { if (top < MAX_STACK - 1) stack[++top] = curr; curr = curr->left; }
+        curr = stack[top--];
+        if (idx < n) outArr[idx++] = curr->data; else break;
+        curr = curr->right;
+    }
+}
+
+// Xay dung BST can bang tu mang CauHoi (da sap xep theo Id tang dan)
+inline nodeCauhoi* buildBalancedBST(CauHoi* arr, int l, int r) {
+    if (arr == NULL || l > r) return NULL;
+    int mid = (l + r) / 2;
+    nodeCauhoi* node = new nodeCauhoi;
+    node->data = arr[mid];
+    node->left = buildBalancedBST(arr, l, mid - 1);
+    node->right = buildBalancedBST(arr, mid + 1, r);
+    return node;
+}
+
+// Giai phong cay (hau tu)
+inline void freeTree(nodeCauhoi* &root) {
+    if (root == NULL) return;
+    freeTree(root->left);
+    freeTree(root->right);
+    delete root;
+    root = NULL;
+}
+
+// Thêm rebuildTree: xóa sort dư thừa, dùng trung vị
+void buildBalancedTree(nodeCauhoi* &root, nodeCauhoi** arr, int start, int end) {
+    if (start > end) { root = NULL; return; }
+    int mid = (start + end) / 2; // Trung vị
+    root = arr[mid];
+    root->left = NULL;
+    root->right = NULL;
+    buildBalancedTree(root->left, arr, start, mid - 1);
+    buildBalancedTree(root->right, arr, mid + 1, end);
+}
+
+void rebuildTree(nodeCauhoi* &root) {
+    // Sử dụng inorderToArray thay vì flattenCauHoi để tránh dependency
+    int n = demNodeCauHoi(root);
+    if (n <= 1) return;
     
-    return NULL; // Không thể tìm được ID duy nhất sau 1000 lần thử
+    CauHoi* arr = new CauHoi[n];
+    inorderToArray(root, arr, n);
+    
+    // Giải phóng cây cũ
+    freeTree(root);
+    
+    // Xây dựng cây cân bằng từ mảng đã sorted
+    root = buildBalancedBST(arr, 0, n - 1);
+    
+    // Giải phóng mảng tạm
+    delete[] arr;
+}
+
+// Tinh chieu cao cay
+inline int chieuCao(nodeCauhoi* root) {
+    if (root == NULL) return 0;
+    int h = 0;
+    const int MAX_STACK = 8192;
+    nodeCauhoi* stack[MAX_STACK]; int top = -1; nodeCauhoi* curr = root;
+    int depthStack[MAX_STACK]; int dtop = -1; int depth = 0; nodeCauhoi* lastVisited = NULL;
+    while (curr != NULL || top >= 0) {
+        if (curr != NULL) {
+            if (top < MAX_STACK - 1) { stack[++top] = curr; depthStack[++dtop] = depth; }
+            curr = curr->left; depth++;
+        } else {
+            curr = stack[top]; int currDepth = depthStack[dtop];
+            if (curr->right != NULL && lastVisited != curr->right) {
+                curr = curr->right; depth = currDepth + 1; continue;
+            }
+            if (currDepth + 1 > h) h = currDepth + 1;
+            lastVisited = curr; curr = NULL; top--; dtop--; depth = currDepth;
+        }
+    }
+    return h;
+}
+
+// log2 integer (approx)
+inline int ilog2_int(int n) {
+    int r = 0; while (n > 1) { n >>= 1; r++; } return r;
 }
 
 // Hàm tạo một node câu hỏi mới
@@ -178,8 +301,13 @@ nodeCauhoi* taoNodeCauHoi(const char* id, const char* noiDung, const char* A, co
 
 // Hàm tạo node câu hỏi với ID tự động (overload)
 nodeCauhoi* taoNodeCauHoi(const char* maMon, const char* noiDung, const char* A, const char* B, const char* C, const char* D, char dapAn, const ListMonHoc& dsMH) {
-    // Sinh ID duy nhất
-    char* id = sinhID(maMon, dsMH);
+    // Sinh ID duy nhất - cần tìm môn học đúng
+    int indexMonHoc = timMonHocTheoMAMH(dsMH, maMon);
+    if (indexMonHoc == -1) {
+        cout << "Khong tim thay mon hoc co ma: " << maMon << endl;
+        return NULL;
+    }
+    char* id = sinhID(maMon, const_cast<MonHoc&>(dsMH.list[indexMonHoc]));
     if (id == NULL) {
         cout << "Khong the sinh ID duy nhat cho cau hoi!\n";
         return NULL;
@@ -364,7 +492,7 @@ void NhapCauHoi(ListMonHoc& dsMH) {
     cout << "Ban da chon mon: " << maMon << " - " << dsMH.list[choice - 1].TENMH << endl;
     
     // Bước 2: Sinh ID tự động
-    char* id = sinhID(maMon, dsMH);
+    char* id = sinhID(maMon, dsMH.list[choice - 1]); // Sử dụng môn học đã chọn
     if (id == NULL) {
         cout << "Khong the sinh ID duy nhat cho cau hoi!\n";
         return;
@@ -787,9 +915,48 @@ void XoaCauHoi(ListMonHoc& dsMH) {
         return;
     }
     
+    // Cảnh báo nếu maxID gần đạt giới hạn
+    if (dsMH.list[indexMonHoc].maxID >= 999) {
+        cout << "\n=== CANH BAO ===\n";
+        cout << "Mon hoc " << maMon << " da dat gan gioi han ID (999)!\n";
+        cout << "Hay xem xet xoa bot cau hoi (trangthai=0) de tiep tuc them cau moi.\n";
+    }
+    
     cout << "\n=== XOA CAU HOI THANH CONG ===\n";
     cout << "Da xoa cau hoi co ID: " << id << endl;
     cout << "Thuoc mon: " << maMon << endl;
+    cout << "Luu y: maxID khong giam khi xoa de tranh tai su dung ID.\n";
+}
+
+// Hàm lấy ngẫu nhiên câu hỏi cho thi trắc nghiệm
+// Trả về mảng câu hỏi ngẫu nhiên, O(n) thời gian
+void layCauHoiNgauNhien(const MonHoc& mh, CauHoi* outArr, int soCauHoi) {
+    if (mh.treeCauHoi == NULL || outArr == NULL || soCauHoi <= 0) {
+        return;
+    }
+    
+    int tongCauHoi = demNodeCauHoi(mh.treeCauHoi);
+    if (soCauHoi > tongCauHoi) {
+        soCauHoi = tongCauHoi; // Không thể lấy nhiều hơn số câu hỏi có sẵn
+    }
+    
+    // Tạo mảng tạm chứa tất cả câu hỏi
+    CauHoi* tempArr = new CauHoi[tongCauHoi];
+    inorderToArray(mh.treeCauHoi, tempArr, tongCauHoi);
+    
+    // Lấy ngẫu nhiên soCauHoi câu hỏi
+    for (int i = 0; i < soCauHoi; i++) {
+        int randomIndex = rand() % tongCauHoi;
+        outArr[i] = tempArr[randomIndex];
+        
+        // Đổi chỗ để tránh lấy trùng
+        if (randomIndex != tongCauHoi - 1) {
+            tempArr[randomIndex] = tempArr[tongCauHoi - 1];
+        }
+        tongCauHoi--;
+    }
+    
+    delete[] tempArr;
 }
 
 #endif

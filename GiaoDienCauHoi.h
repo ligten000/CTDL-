@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <iomanip>
-#include <vector>
 #include <cstring>
 #include "CTDL.h"
 #include "mylib.h"
@@ -16,24 +15,35 @@ using namespace std;
 static const int CH_PAGE_SIZE = 10;
 static const int CH_MOUSE = 20;
 
-// Duyệt cây in-order và lưu vào danh sách
-static void flattenCauHoi(nodeCauhoi *root, vector<nodeCauhoi*> &out) {
-	if (root == NULL) return;
-	const int MAX_STACK = 4096;
-	nodeCauhoi* stack[MAX_STACK];
-	int top = -1;
-	nodeCauhoi* curr = root;
-	while (curr != NULL || top >= 0) {
-		while (curr != NULL) {
-			if (top < MAX_STACK - 1) stack[++top] = curr; else break;
-			curr = curr->left;
-		}
-		if (top >= 0) {
-			curr = stack[top--];
-			out.push_back(curr);
-			curr = curr->right;
-		} else break;
-	}
+// Duyệt cây in-order và lưu vào mảng động
+static int flattenCauHoi(nodeCauhoi *root, nodeCauhoi*** outArray) {
+    if (root == NULL) {
+        *outArray = NULL;
+        return 0;
+    }
+    
+    int count = demNodeCauHoi(root);
+    *outArray = new nodeCauhoi*[count];
+    
+    int index = 0;
+    const int MAX_STACK = 4096;
+    nodeCauhoi* stack[MAX_STACK];
+    int top = -1;
+    nodeCauhoi* curr = root;
+    
+    while (curr != NULL || top >= 0) {
+        while (curr != NULL) {
+            if (top < MAX_STACK - 1) stack[++top] = curr;
+            else break;
+            curr = curr->left;
+        }
+        if (top >= 0) {
+            curr = stack[top--];
+            (*outArray)[index++] = curr;
+            curr = curr->right;
+        } else break;
+    }
+    return count;
 }
 
 static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
@@ -65,8 +75,17 @@ static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	}
 
 	if (!KiemTraHopLeCauHoi(noiDungBuf, A, B, C, D, dapAn)) { thongBaoLoi("Cau hoi khong hop le", 0, CH_MOUSE + 7); return; }
-	char *id = sinhID(mh.MAMH, dsMH);
-	if (id == NULL) { thongBaoLoi("Khong sinh duoc ID", 0, CH_MOUSE + 7); return; }
+	// Xac nhan truoc khi them
+	gotoxy(0, CH_MOUSE + 7); cout << "Ban co chac chan muon them cau hoi? (Y/N): ";
+	{
+		char c;
+		while (true) { c = toupper(getch()); if (c=='N') return; if (c=='Y') break; }
+	}
+	char *id = sinhID(mh.MAMH, mh); // Dùng sinhID ngẫu nhiên thay vì tuần tự
+	if (id == NULL) { 
+		thongBaoLoi("Khong sinh duoc ID (het gioi han hoac trung)", 0, CH_MOUSE + 7); 
+		return; 
+	}
 	CauHoi ch{};
 	strncpy(ch.Id, id, sizeof(ch.Id)-1);
 	ch.NoiDung = string(noiDungBuf);
@@ -76,7 +95,15 @@ static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	strncpy(ch.D, D, sizeof(ch.D)-1);
 	ch.DapAn = dapAn;
 	ch.trangthai = 0;
-	ChenCauHoiTheoId(mh.treeCauHoi, ch);
+	ChenCauHoiTheoId(mh.treeCauHoi, ch, mh); // Truyền tham chiếu mh để cập nhật maxID
+	mh.insertsSinceRebuild++;
+	int nNodes = demNodeCauHoi(mh.treeCauHoi);
+	int h = chieuCao(mh.treeCauHoi);
+	// Tăng ngưỡng lên 100 và kiểm tra chiều cao để ngăn cây suy biến
+	if (mh.insertsSinceRebuild >= 100 || h > ilog2_int(max(1, nNodes)) + 2) {
+		rebuildTree(mh.treeCauHoi);
+		mh.insertsSinceRebuild = 0;
+	}
 	thongBaoLoi("Them cau hoi thanh cong", 0, CH_MOUSE + 8);
 }
 
@@ -84,8 +111,18 @@ static void suaCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	if (mh.treeCauHoi == NULL) { thongBaoLoi("Mon chua co cau hoi", 0, CH_MOUSE); return; }
 	char id[16];
 	gotoxy(0, CH_MOUSE); cout << "Nhap ID cau hoi can sua:";
-	gotoxy(0, CH_MOUSE + 1); cout << "ID:"; gotoxy(4, CH_MOUSE + 1); NhapMa(id, 16);
-	if (strlen(id) == 0) { thongBaoLoi("ID rong", 4, CH_MOUSE + 1); return; }
+	while (true) {
+		gotoxy(0, CH_MOUSE + 1); cout << "ID:"; gotoxy(4, CH_MOUSE + 1);
+		NhapMa(id, 16);
+		if (strlen(id) == 0) {
+			thongBaoLoi("ID rong", 4, CH_MOUSE + 1);
+			gotoxy(0, CH_MOUSE + 2); cout << "Nhan ESC de huy, phim bat ky de nhap lai";
+			char cc = getch();
+			for (int i = CH_MOUSE; i <= CH_MOUSE + 2; ++i) { gotoxy(0, i); clearCurrentLine(); }
+			if (cc == 27) return; else { gotoxy(0, CH_MOUSE); cout << "Nhap ID cau hoi can sua:"; continue; }
+		}
+		break;
+	}
 	nodeCauhoi* node = timCauHoiTheoId(mh.treeCauHoi, id);
 	if (node == NULL) { thongBaoLoi("Khong tim thay ID", 4, CH_MOUSE + 1); return; }
 	// Hien thi va sua
@@ -121,8 +158,18 @@ static void xoaCauHoiUI(MonHoc &mh) {
 	if (mh.treeCauHoi == NULL) { thongBaoLoi("Mon chua co cau hoi", 0, CH_MOUSE); return; }
 	char id[16];
 	gotoxy(0, CH_MOUSE); cout << "Nhap ID cau hoi muon xoa:";
-	gotoxy(0, CH_MOUSE + 1); cout << "ID:"; gotoxy(4, CH_MOUSE + 1); NhapMa(id, 16);
-	if (strlen(id) == 0) { thongBaoLoi("ID rong", 4, CH_MOUSE + 1); return; }
+	while (true) {
+		gotoxy(0, CH_MOUSE + 1); cout << "ID:"; gotoxy(4, CH_MOUSE + 1);
+		NhapMa(id, 16);
+		if (strlen(id) == 0) {
+			thongBaoLoi("ID rong", 4, CH_MOUSE + 1);
+			gotoxy(0, CH_MOUSE + 2); cout << "Nhan ESC de huy, phim bat ky de nhap lai";
+			char cc = getch();
+			for (int i = CH_MOUSE; i <= CH_MOUSE + 2; ++i) { gotoxy(0, i); clearCurrentLine(); }
+			if (cc == 27) return; else { gotoxy(0, CH_MOUSE); cout << "Nhap ID cau hoi muon xoa:"; continue; }
+		}
+		break;
+	}
 	nodeCauhoi* node = timCauHoiTheoId(mh.treeCauHoi, id);
 	if (node == NULL) { thongBaoLoi("Khong tim thay ID", 4, CH_MOUSE + 1); return; }
 	if (node->data.trangthai == 1) { thongBaoLoi("Cau hoi da thi, khong the xoa", 0, CH_MOUSE + 2); return; }
@@ -137,11 +184,12 @@ inline bool hienthiDanhSachCauHoi(ListMonHoc &dsMH, MonHoc &mh) {
 	char a;
 	int currentPage = 1;
 	int numPage = 1;
+	
 	while (true) {
-		vector<nodeCauhoi*> rows; rows.reserve(256);
-		flattenCauHoi(mh.treeCauHoi, rows);
-		int total = static_cast<int>(rows.size());
-		numPage = (total + CH_PAGE_SIZE - 1) / CH_PAGE_SIZE; if (numPage <= 0) numPage = 1;
+		nodeCauhoi** rows = NULL;
+		int total = flattenCauHoi(mh.treeCauHoi, &rows);
+		numPage = (total + CH_PAGE_SIZE - 1) / CH_PAGE_SIZE;
+		if (numPage <= 0) numPage = 1;
 		int start = (currentPage - 1) * CH_PAGE_SIZE;
 		int end = min(start + CH_PAGE_SIZE, total);
 
@@ -184,6 +232,10 @@ inline bool hienthiDanhSachCauHoi(ListMonHoc &dsMH, MonHoc &mh) {
 		gotoxy(0, 18); cout << "A: Them | D: Xoa | E: Sua | S: Luu | <-/-> Trang | Q: Thoat";
 		gotoxy(45, 18); cout << "(" << currentPage << "/" << numPage << ")";
 		for (int i = CH_MOUSE; i < CH_MOUSE + 10; ++i) { gotoxy(0, i); clearCurrentLine(); }
+		
+		// Giải phóng bộ nhớ
+		delete[] rows;
+		
 		a = toupper(getch());
 		if (a == -32 || a == 0) { a = getch(); if (a==75 && currentPage>1) currentPage--; else if (a==77 && currentPage<numPage) currentPage++; }
 		else {

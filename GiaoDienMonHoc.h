@@ -106,6 +106,8 @@ static void themMonHocUI(ListMonHoc &dsMH) {
 	strcpy(dsMH.list[pos].MAMH, mamh);
 	strcpy(dsMH.list[pos].TENMH, tenmh);
 	dsMH.list[pos].treeCauHoi = NULL;
+	dsMH.list[pos].insertsSinceRebuild = 0;
+	dsMH.list[pos].maxID = 0; // Khởi tạo maxID = 0 cho môn học mới
 	dsMH.n++;
 	thongBaoLoi("Them mon hoc thanh cong", 0, MH_MOUSE + 4);
 }
@@ -122,7 +124,19 @@ static void xoaMonHocUI(ListMonHoc &dsMH) {
 		chuanHoaMaMonHoc(mamh);
 		if (strlen(mamh) == 0) { thongBaoLoi("Ma mon trong", 6, MH_MOUSE + 1); continue; }
 		if (!timMonHocTheoMa(dsMH, mamh, idx)) { thongBaoLoi("Khong tim thay mon hoc", 6, MH_MOUSE + 1); continue; }
-		if (dsMH.list[idx].treeCauHoi != NULL) { thongBaoLoi("Mon da co cau hoi, khong the xoa", 0, MH_MOUSE + 2); continue; }
+		if (dsMH.list[idx].treeCauHoi != NULL) {
+			thongBaoLoi("Mon da co cau hoi, khong the xoa", 0, MH_MOUSE + 2);
+			gotoxy(0, MH_MOUSE + 3); cout << "Ban co muon thuc hien lai thao tac? (Y/N): ";
+			char cxy;
+			while (true) {
+				cxy = toupper(getch());
+				if (cxy == 'Y') { for (int i = MH_MOUSE; i <= MH_MOUSE + 4; ++i) { gotoxy(0, i); clearCurrentLine(); } idx = -1; break; }
+				if (cxy == 'N') { for (int i = MH_MOUSE; i <= MH_MOUSE + 4; ++i) { gotoxy(0, i); clearCurrentLine(); } return; }
+			}
+			gotoxy(0, MH_MOUSE); cout << "Nhap ma mon muon xoa";
+			gotoxy(0, MH_MOUSE + 1); cout << "MAMH:";
+			continue;
+		}
 		break;
 	}
 	gotoxy(0, MH_MOUSE + 3); cout << "Ban co chac chan muon xoa? (Y/N): ";
@@ -133,7 +147,7 @@ static void xoaMonHocUI(ListMonHoc &dsMH) {
 	thongBaoLoi("Xoa thanh cong", 0, MH_MOUSE + 4);
 }
 
-static void suaMonHocUI(ListMonHoc &dsMH) {
+static void suaMonHocUI(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 	if (dsMH.n == 0) { thongBaoLoi("Danh sach mon hoc rong", 0, MH_MOUSE); return; }
 	char mamh[16];
 	int idx = -1;
@@ -147,24 +161,81 @@ static void suaMonHocUI(ListMonHoc &dsMH) {
 		if (!timMonHocTheoMa(dsMH, mamh, idx)) { thongBaoLoi("Khong tim thay mon hoc", 6, MH_MOUSE + 1); continue; }
 		break;
 	}
-	// Chỉ cho sửa TENMH để tránh phá vỡ định danh ID câu hỏi
+	// Cho phep sua ca MAMH va TENMH, cap nhat cac lien ket phu thuoc
+	char mamhMoi[16]; strcpy(mamhMoi, dsMH.list[idx].MAMH);
 	char tenmh[50]; strcpy(tenmh, dsMH.list[idx].TENMH);
-	gotoxy(0, MH_MOUSE + 2); cout << "TENMH:";
+	gotoxy(0, MH_MOUSE + 2); cout << "MAMH moi:";
 	while (true) {
-		gotoxy(7, MH_MOUSE + 2);
-		NhapChuoi(tenmh, 50);
-		chuanHoaTenMonHoc(tenmh);
-		if (!HopLeTenMon(tenmh)) { thongBaoLoi("Ten mon khong hop le", 7, MH_MOUSE + 2); continue; }
+		gotoxy(10, MH_MOUSE + 2);
+		NhapMa(mamhMoi, 16);
+		chuanHoaMaMonHoc(mamhMoi);
+		if (strlen(mamhMoi) == 0) { strcpy(mamhMoi, dsMH.list[idx].MAMH); break; }
+		if (!HopLeMAMH(mamhMoi)) { thongBaoLoi("Ma mon khong hop le (3-5 ky tu A-Z)", 10, MH_MOUSE + 2); continue; }
+		int tmpIdx; if (strcmp(mamhMoi, dsMH.list[idx].MAMH)!=0 && timMonHocTheoMa(dsMH, mamhMoi, tmpIdx)) { thongBaoLoi("Ma mon da ton tai", 10, MH_MOUSE + 2); continue; }
 		break;
 	}
-	gotoxy(0, MH_MOUSE + 3); cout << "Luu thay doi? (Y/N): ";
+	gotoxy(0, MH_MOUSE + 3); cout << "TENMH:";
+	while (true) {
+		gotoxy(7, MH_MOUSE + 3);
+		NhapChuoi(tenmh, 50);
+		chuanHoaTenMonHoc(tenmh);
+		if (!HopLeTenMon(tenmh)) { thongBaoLoi("Ten mon khong hop le", 7, MH_MOUSE + 3); continue; }
+		break;
+	}
+	gotoxy(0, MH_MOUSE + 4); cout << "Luu thay doi? (Y/N): ";
 	char ch;
 	while (true) { ch = toupper(getch()); if (ch == 'N') return; if (ch == 'Y') break; }
+
+	// Cap nhat TENMH
 	strcpy(dsMH.list[idx].TENMH, tenmh);
-	thongBaoLoi("Sua thanh cong", 0, MH_MOUSE + 4);
+
+	// Neu thay doi MAMH, cap nhat toan bo he thong lien quan
+	if (strcmp(mamhMoi, dsMH.list[idx].MAMH) != 0) {
+		char mamhCu[16]; strcpy(mamhCu, dsMH.list[idx].MAMH);
+		// 1) Cap nhat MAMH trong danh sach mon hoc
+		strcpy(dsMH.list[idx].MAMH, mamhMoi);
+		// 2) Cap nhat MAMH trong danh sach diem thi cua tat ca sinh vien
+		for (int iL = 0; iL < dsLop.n; ++iL) {
+			if (dsLop.lop[iL] == NULL) continue;
+			for (nodeSinhVien* pSV = dsLop.lop[iL]->listSV; pSV != NULL; pSV = pSV->next) {
+				nodeDiemThi* pD = pSV->sv.dsDiemThi;
+				for (; pD != NULL; pD = pD->next) {
+					if (strcmp(pD->diem.MAMH, mamhCu) == 0) {
+						strcpy(pD->diem.MAMH, mamhMoi);
+					}
+				}
+			}
+		}
+		// 3) Doi prefix ID cua tat ca cau hoi trong mon hoc khong dung vector: xay cay moi
+		{
+			nodeCauhoi* oldRoot = dsMH.list[idx].treeCauHoi;
+			nodeCauhoi* newRoot = NULL;
+			const int MAX_STACK = 4096;
+			nodeCauhoi* stack[MAX_STACK]; int top = -1; nodeCauhoi* cur = oldRoot;
+			while (cur != NULL || top >= 0) {
+				while (cur != NULL) { if (top < MAX_STACK - 1) stack[++top] = cur; cur = cur->left; }
+				cur = stack[top--];
+				CauHoi ch = cur->data;
+				char so[16] = {0};
+				int len = (int)strlen(ch.Id);
+				int pos = 0; while (ch.Id[pos] && !isdigit(ch.Id[pos])) pos++;
+				if (pos < len) { strncpy(so, ch.Id + pos, sizeof(so)-1); }
+				char idMoi[16]; idMoi[0] = '\0';
+				sprintf(idMoi, "%s%s", mamhMoi, so);
+				strncpy(ch.Id, idMoi, sizeof(ch.Id)-1);
+				ch.Id[sizeof(ch.Id)-1] = '\0';
+				ChenCauHoiTheoId(newRoot, ch, dsMH.list[idx]); // Truyền tham chiếu monHoc để cập nhật maxID
+				cur = cur->right;
+			}
+			dsMH.list[idx].treeCauHoi = newRoot;
+		}
+		xapxepDanhSachMonHoc(dsMH);
+	}
+
+	thongBaoLoi("Sua thanh cong", 0, MH_MOUSE + 5);
 }
 
-inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH) {
+inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 	Normal(); system("cls");
 	char a;
 	int currentPage = 1;
@@ -228,15 +299,32 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH) {
 				case 'D':
 					xoaMonHocUI(dsMH); numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
 				case 'E':
-					suaMonHocUI(dsMH); break;
+					suaMonHocUI(dsMH, dsLop); break;
 				case 'B':
 				{
-					char mamh[16]; int idx=-1;
-					gotoxy(0, MH_MOUSE); cout << "Nhap ma mon de quan ly cau hoi:";
-					gotoxy(0, MH_MOUSE+1); cout << "MAMH:"; gotoxy(6, MH_MOUSE+1); NhapMa(mamh, 16); chuanHoaMaMonHoc(mamh);
-					if (strlen(mamh) == 0) { thongBaoLoi("Ma mon rong", 6, MH_MOUSE+1); break; }
-					if (!timMonHocTheoMa(dsMH, mamh, idx)) { thongBaoLoi("Khong tim thay mon", 6, MH_MOUSE+1); break; }
-					hienthiDanhSachCauHoi(dsMH, dsMH.list[idx]);
+					while (true) {
+						char mamh[16]; int idx=-1;
+						gotoxy(0, MH_MOUSE); cout << "Nhap ma mon de quan ly cau hoi:";
+						gotoxy(0, MH_MOUSE+1); cout << "MAMH:"; gotoxy(6, MH_MOUSE+1);
+						NhapMa(mamh, 16);
+						chuanHoaMaMonHoc(mamh);
+						if (strlen(mamh) == 0) {
+							thongBaoLoi("Ma mon rong", 6, MH_MOUSE+1);
+							gotoxy(0, MH_MOUSE+2); cout << "Nhan ESC de huy, phim bat ky de nhap lai";
+							char c = getch();
+							for (int i = MH_MOUSE; i < MH_MOUSE + 3; ++i) { gotoxy(0, i); clearCurrentLine(); }
+							if (c == 27) break; else continue;
+						}
+						if (!timMonHocTheoMa(dsMH, mamh, idx)) {
+							thongBaoLoi("Khong tim thay mon", 6, MH_MOUSE+1);
+							gotoxy(0, MH_MOUSE+2); cout << "Nhan ESC de huy, phim bat ky de nhap lai";
+							char c = getch();
+							for (int i = MH_MOUSE; i < MH_MOUSE + 3; ++i) { gotoxy(0, i); clearCurrentLine(); }
+							if (c == 27) break; else continue;
+						}
+						hienthiDanhSachCauHoi(dsMH, dsMH.list[idx]);
+						break;
+					}
 					break;
 				}
 				case 'S':
