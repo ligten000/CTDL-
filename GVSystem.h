@@ -213,6 +213,18 @@ void xoaLop(DanhSachLop&dsLop){
     } 
 }
 
+int timLop(DanhSachLop& ds, char* malop){
+    int i;
+    for (i = 0; i < ds.n; ++i) {
+        int cmp = strcmp(ds.lop[i]->MALOP, malop);
+        if (cmp == 0) {
+            return i;
+        }
+        if (cmp > 0) break;
+    }
+    return -1;
+}
+
 void suaLop(DanhSachLop& ds, int start, int end) {
     char malop[15], tenlop[50];
     gotoxy(0,mouse);
@@ -229,20 +241,13 @@ void suaLop(DanhSachLop& ds, int start, int end) {
             continue;
         }
 
-        bool found = false;
-        for (i = 0; i < ds.n; ++i) {
-            int cmp = strcmp(ds.lop[i]->MALOP, malop);
-            if (cmp == 0) {
-                found = true;
-                break;
-            }
-            if (cmp > 0) break;
-        }
+        i = timLop(ds, malop);
 
-        if (!found) {
+        if (i < 0) {
             clearLine(21,mouse,15);
             thongBaoLoi("Ma lop khong ton tai", 21, mouse);
-        } else break;
+        } 
+        else break;
     }
 
     // Bước 2: Hiển thị để sửa
@@ -320,6 +325,7 @@ void suaLop(DanhSachLop& ds, int start, int end) {
                         GhiDanhSachLop(ds, "Lop.txt");
                         thongBaoLoi("Luu thanh cong", 0,23);
                         inDanhSachLop(ds,start, end);
+                        i = timLop(ds,malop);
                         gotoxy(0,mouse +3);
                         clearCurrentLine();
                         break;
