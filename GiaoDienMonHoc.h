@@ -236,7 +236,7 @@ static void suaMonHocUI(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 }
 
 inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
-	Normal(); system("cls");
+	
 	char a;
 	int currentPage = 1;
 	int start;
@@ -244,27 +244,29 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 	int numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE;
 
 	// Khung tiêu đề
-	cout << char(218) << string(10, char(196)) << char(194)
+	
+	while (true) {
+		Normal(); system("cls");
+		cout << char(218) << string(10, char(196)) << char(194)
 	     << string(20, char(196)) << char(194)
 	     << string(40, char(196)) << char(194)
 	     << string(15, char(196)) << char(191) << endl;
-	cout << char(179) << setw(10) << left << "STT"
-	     << char(179) << setw(20) << left << "Ma Mon"
-	     << char(179) << setw(40) << left << "Ten Mon"
-	     << char(179) << setw(15) << left << "So cau"
-	     << char(179) << endl;
-	cout << char(195) << string(10, char(196)) << char(197)
-	     << string(20, char(196)) << char(197)
-	     << string(40, char(196)) << char(197)
-	     << string(15, char(196)) << char(180) << endl;
+		cout << char(179) << setw(10) << left << "STT"
+			<< char(179) << setw(20) << left << "Ma Mon"
+			<< char(179) << setw(40) << left << "Ten Mon"
+			<< char(179) << setw(15) << left << "So cau"
+			<< char(179) << endl;
+		cout << char(195) << string(10, char(196)) << char(197)
+			<< string(20, char(196)) << char(197)
+			<< string(40, char(196)) << char(197)
+			<< string(15, char(196)) << char(180) << endl;
 
-	gotoxy(0, 18);
-	cout << "A: Them | D: Xoa | E: Sua | B: Chon mon | S: Luu | Q: Thoat" << endl;
-	while (true) {
-		start = (currentPage - 1) * MH_PAGE_SIZE;
-		end = min(start + MH_PAGE_SIZE, dsMH.n);
-		// clear vung du lieu
-		for (int i = 0; i <= MH_PAGE_SIZE; ++i) { gotoxy(0, 3 + i); cout << string(90, ' '); }
+		gotoxy(0, 18);
+		cout << "A: Them | D: Xoa | E: Sua | B: Chon mon | S: Luu | Q: Thoat" << endl;
+			start = (currentPage - 1) * MH_PAGE_SIZE;
+			end = min(start + MH_PAGE_SIZE, dsMH.n);
+			// clear vung du lieu
+		
 		gotoxy(0, 3);
 		for (int i = start; i < end; ++i) {
 			cout << char(179) << setw(10) << left << i + 1
@@ -302,8 +304,9 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 					suaMonHocUI(dsMH, dsLop); break;
 				case 'B':
 				{
+					char mamh[16]; int idx=-1;
 					while (true) {
-						char mamh[16]; int idx=-1;
+						
 						gotoxy(0, MH_MOUSE); cout << "Nhap ma mon de quan ly cau hoi:";
 						gotoxy(0, MH_MOUSE+1); cout << "MAMH:"; gotoxy(6, MH_MOUSE+1);
 						NhapMa(mamh, 16);
@@ -322,9 +325,10 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 							for (int i = MH_MOUSE; i < MH_MOUSE + 3; ++i) { gotoxy(0, i); clearCurrentLine(); }
 							if (c == 27) break; else continue;
 						}
-						hienthiDanhSachCauHoi(dsMH, dsMH.list[idx]);
+						
 						break;
 					}
+					hienthiDanhSachCauHoi(dsMH, dsMH.list[idx]);
 					break;
 				}
 				case 'S':
