@@ -1,5 +1,6 @@
 #include <iostream>
 #include <windows.h>
+#include <ctime>
 #include "mylib.h"
 #include "CTDL.h"
 #include "file_lop.h"
@@ -94,7 +95,7 @@ bool SystemGV(DanhSachLop &dsLop, ListMonHoc &dsMH, int chon, int item){
                 }
                 break;
             case 2:
-                if(hienthidanhsachMonHoc(dsMH)){
+                if(hienthidanhsachMonHoc(dsMH, dsLop)){
                     chon = UIMenu(menu, item);  // Gọi lại menu nếu người dùng thoát
                     continue;
                 }
@@ -228,6 +229,9 @@ void login(DanhSachLop& dsLop, ListMonHoc& dsMH) {
 
 int main(int argc, char const *argv[])
 {
+    // Khởi tạo seed cho hàm rand() để sinh ID ngẫu nhiên
+    srand(time(0));
+    
     DanhSachLop dsLop;
     ListMonHoc dsMonHoc;
 

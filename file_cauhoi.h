@@ -7,6 +7,7 @@
 #include <cstring>
 #include <unordered_set>
 #include "CTDL.h"
+#include "Cau_Hoi.h"
 
 using namespace std;
 
@@ -47,15 +48,30 @@ static nodeCauhoi* TaoNode(const CauHoi &ch) {
 	return p;
 }
 
-// Chèn vào BST theo so sánh chuỗi Id (lexicographical)
-static void ChenCauHoiTheoId(nodeCauhoi* &root, const CauHoi &ch) {
-	if (root == NULL) { root = TaoNode(ch); return; }
-	int cmp = strcmp(ch.Id, root->data.Id);
-	if (cmp < 0) ChenCauHoiTheoId(root->left, ch);
-	else if (cmp > 0) ChenCauHoiTheoId(root->right, ch);
-	else {
-		// Id trùng trên cùng cây -> bỏ qua để đảm bảo duy nhất
-	}
+// Sửa ChenCauHoiTheoId: ngưỡng 100, cập nhật maxID
+static void ChenCauHoiTheoId(nodeCauhoi* &root, const CauHoi &ch, MonHoc &mh) {
+    if (root == NULL) { 
+        root = TaoNode(ch); 
+        mh.insertsSinceRebuild++;
+    } else {
+        int cmp = strcmp(ch.Id, root->data.Id);
+        if (cmp < 0) ChenCauHoiTheoId(root->left, ch, mh);
+        else if (cmp > 0) ChenCauHoiTheoId(root->right, ch, mh);
+        else return; // Trùng ID, bỏ qua
+        mh.insertsSinceRebuild++;
+    }
+    
+    // Cập nhật maxID từ ID mới
+    int num = atoi(ch.Id + strlen(mh.MAMH));
+    if (num > mh.maxID) mh.maxID = num;
+    
+    // Kiểm tra và rebuild (ngưỡng 100)
+    int n = demNodeCauHoi(root);
+    int h = chieuCao(root);
+    if (mh.insertsSinceRebuild >= 100 || h > ilog2_int(max(1, n)) + 2) {
+        rebuildTree(root);
+        mh.insertsSinceRebuild = 0;
+    }
 }
 
 // Đọc dòng MONHOC và thêm vào danh sách
@@ -71,12 +87,14 @@ static void DocMonHoc(const string &line, ListMonHoc &dsMH) {
 	strncpy(mh.MAMH, mamh.c_str(), sizeof(mh.MAMH)-1); mh.MAMH[sizeof(mh.MAMH)-1] = '\0';
 	strncpy(mh.TENMH, tenmh.c_str(), sizeof(mh.TENMH)-1); mh.TENMH[sizeof(mh.TENMH)-1] = '\0';
 	mh.treeCauHoi = NULL;
+	mh.insertsSinceRebuild = 0;
+	mh.maxID = 0; // Khởi tạo maxID = 0
 }
 
 // Đọc dòng CAUHOI và chèn vào treeCauHoi của môn hiện tại
-static void DocCauHoi(const string &line, MonHoc *monHienTai, unordered_set<string> &idSet) {
+static void DocCauHoi(const string &line, MonHoc &monHienTai, unordered_set<string> &idSet) {
 	// line: CAUHOI|ID|NOIDUNG|A|B|C|D|DAPAN|TRANGTHAI
-	if (monHienTai == NULL) return; // Không có MONHOC trước đó
+	// Không cần kiểm tra NULL vì đã là tham chiếu
 	stringstream ss(line);
 	string prefix, id, nd, A, B, C, D, dapAnStr, ttStr;
 	getline(ss, prefix, '|');
@@ -92,6 +110,18 @@ static void DocCauHoi(const string &line, MonHoc *monHienTai, unordered_set<stri
 	// Đảm bảo ID duy nhất toàn hệ thống
 	if (idSet.find(id) != idSet.end()) return; // bỏ qua bản ghi trùng
 	idSet.insert(id);
+	
+	// Cập nhật maxID khi đọc từ file
+	const char* idStr = id.c_str();
+	int pos = 0; 
+	while (idStr[pos] && !isdigit(idStr[pos])) pos++;
+	if (idStr[pos]) {
+		int num = atoi(idStr + pos);
+		if (num > monHienTai.maxID) {
+			monHienTai.maxID = num;
+		}
+	}
+	
 	CauHoi ch{};
 	strncpy(ch.Id, id.c_str(), sizeof(ch.Id)-1); ch.Id[sizeof(ch.Id)-1] = '\0';
 	ch.NoiDung = nd;
@@ -101,7 +131,7 @@ static void DocCauHoi(const string &line, MonHoc *monHienTai, unordered_set<stri
 	strncpy(ch.D, D.c_str(), sizeof(ch.D)-1); ch.D[sizeof(ch.D)-1] = '\0';
 	ch.DapAn = dapAnStr.empty() ? 'A' : static_cast<char>(toupper(dapAnStr[0]));
 	ch.trangthai = ttStr.empty() ? 0 : atoi(ttStr.c_str());
-	ChenCauHoiTheoId(monHienTai->treeCauHoi, ch);
+	ChenCauHoiTheoId(monHienTai.treeCauHoi, ch, monHienTai);
 }
 
 // API đọc file theo định dạng mới
@@ -121,7 +151,7 @@ inline void DocFile(ListMonHoc &dsMH, const char* filename) {
 			DocMonHoc(line, dsMH);
 			monHienTai = &dsMH.list[dsMH.n - 1];
 		} else if (line.rfind("CAUHOI|", 0) == 0) {
-			DocCauHoi(line, monHienTai, idSet);
+			DocCauHoi(line, *monHienTai, idSet);
 		} else {
 			// dòng trống hoặc không hợp lệ -> bỏ qua
 		}
