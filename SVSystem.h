@@ -118,21 +118,39 @@ nodeDiemThi* themNodeBaiThi(nodeDiemThi*& head, char* mmh){
     }
     return NULL;
 }
+void xapXep(int X[],int n){ 
+    int a; 
+    for (int i = 0; i < n - 1; ++i) { 
+        for (int j = i + 1; j < n; ++j) { 
+            if (X[i] > X[j]) { 
+                a = X[i]; 
+                X[i] = X[j]; 
+                X[j] = a; 
+            } 
+        } 
+    } 
+}
 
 void layDeThi(Baithi*&bt, nodeCauhoi*&tree, int n){
-    int X[n];
-    bt->dsBaithichitiet= new BaiThiChiTiets[n];
+    bt->dsBaithichitiet = new BaiThiChiTiets[n];
     bt->n = 0;
     int a = demCay(tree);
-    srand(time(0)); 
-    int wi = 0;
-    while(wi < n){
-        int r = rand() % a; 
-        if(!timSo(X, wi, r)){
-            X[wi++] = r;
-        }
+
+    int X[a];
+    for (int i = 0; i < a; i++) {
+        X[i] = i;
     }
 
+    srand(time(0));
+    int swap;
+    // Fisher–Yates: chọn n số đầu tiên đã được shuffle
+    for (int wi = 0; wi < n; wi++) {
+        int r = wi + rand() % (a - wi);  // chọn từ [wi..a-1]
+        swap = X[wi]; 
+        X[wi] = X[r]; 
+        X[r] = swap; wi++;
+    }
+    xapXep(X, n);
     StackNode stack;
     nodeCauhoi* current = tree;
     int count = 0;
@@ -143,7 +161,7 @@ void layDeThi(Baithi*&bt, nodeCauhoi*&tree, int n){
         }
 
         current = stack.pop(); 
-        if(timSo(X,n,count)){
+        if(X[bt->n] == count){
             bt->dsBaithichitiet[bt->n].cauhoi = current;
             bt->dsBaithichitiet[bt->n].traloi = '\0';
             bt->n++;
