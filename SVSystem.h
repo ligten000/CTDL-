@@ -63,23 +63,9 @@ int demCay(nodeCauhoi *root) {
     return count;
 }
 
-void xapXep(int X[],int n){
-    int a;
-    for (int i = 0; i < n - 1; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            if (X[i] > X[j]) {
-                a = X[i];
-                X[i] = X[j];
-                X[j] = a;
-            }
-        }
-    }
-}
-
 bool timSo(int X[], int n, int a){
-    for(int i = 0; i< n; i++){
+    for(int i = 0; i < n; i++){
         if(X[i] == a) return true;
-        if(X[i]>a) break;
     }
     return false;
 }
@@ -146,7 +132,6 @@ void layDeThi(Baithi*&bt, nodeCauhoi*&tree, int n){
             X[wi++] = r;
         }
     }
-    xapXep(X, n);
 
     StackNode stack;
     nodeCauhoi* current = tree;
@@ -227,7 +212,6 @@ void BatDauThi(nodeDiemThi* &bt, int minute){
                         ketThuc = true;
                     }
                     else index++;
-                    break;
                 }
             }
         }
@@ -255,7 +239,7 @@ void chuanBiThi(nodeSinhVien* &sv, DanhSachLop &dsLop, ListMonHoc &dsMH){
     int thoigianthi = 0;
     int socau = 0;
     int i;
-    gotoxy(0,0);cout<<"Nhap ma mon:";
+    gotoxy(0,0);cout<<"Nhap ma mon  :";
     gotoxy(0,1);cout<<"So cau hoi"; gotoxy(13,1); cout<<":";
     gotoxy(20,1); cout<<"Cau";
     gotoxy(0,2);cout<<"Thoi gian thi:"; gotoxy(20,2); cout<<"Phut";
@@ -316,6 +300,7 @@ void chuanBiThi(nodeSinhVien* &sv, DanhSachLop &dsLop, ListMonHoc &dsMH){
         if(ch == 13 || ch == 27){
             cout<<endl;
             GhiDanhSachLop(dsLop, "Lop.txt");
+            GhiFile(dsMH, "MonHoc.txt");
             clrscr();
             return;
         }
