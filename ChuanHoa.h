@@ -3,28 +3,12 @@
 
 #include <string>
 #include <cctype> 
+#include <cstring>
 using namespace std;
 
-inline int strim(string &a, string &result){
-    if (a.empty()) return 0;
-    int n = a.length();
-    while (isspace(a[n -1]))
-    {
-        a.pop_back();
-        n--;
-    }
-    int i = 0;
-    while (i < n && isspace(a[i])) i++;
-    if (i == n) return 0;
 
-    while (i<n)
-    {
-        result += a[i];
-    } 
-    return 1;
-};
 
-#include <cstring>
+
 
 
 void chuanHoaKhoangCach(char S[]) {
@@ -85,103 +69,7 @@ inline int ChuanHoaTen(string &a,string &result) {
     return !result.empty();
 }
 
-// void chuanHoaTenMonHoc(char* tenMon) {
-//     if (tenMon == NULL || strlen(tenMon) == 0) return;
-    
-//     int len = strlen(tenMon);
-//     char* temp = new char[len + 1];
-//     strcpy(temp, tenMon);
-    
-//     // Bước 1: Xóa khoảng trắng đầu và cuối
-//     int start = 0, end = len - 1;
-//     while (start < len && (temp[start] == ' ' || temp[start] == '\t')) start++;
-//     while (end >= 0 && (temp[end] == ' ' || temp[end] == '\t')) end--;
-    
-//     if (start > end) {
-//         tenMon[0] = '\0';
-//         delete[] temp;
-//         return;
-//     }
-    
-//     // Bước 2: Chuẩn hóa khoảng trắng giữa các từ và chữ cái
-//     int j = 0;
-//     bool prevSpace = false;
-//     bool prevLetter = false;
-    
-//     for (int i = start; i <= end; i++) {
-//         char c = temp[i];
-        
-//         // Nếu là khoảng trắng
-//         if (c == ' ' || c == '\t') {
-//             if (!prevSpace && prevLetter) {
-//                 tenMon[j++] = ' ';
-//                 prevSpace = true;
-//             }
-//         }
-//         // Nếu là chữ cái hoặc số
-//         else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-//             if (prevLetter) {
-//                 // Chữ cái thường giữa từ
-//                 tenMon[j++] = tolower(c);
-//             } else {
-//                 // Chữ cái đầu từ - viết hoa
-//                 tenMon[j++] = toupper(c);
-//             }
-//             prevLetter = true;
-//             prevSpace = false;
-//         }
-//         // Bỏ qua các ký tự khác
-//     }
-    
-//     // Xóa khoảng trắng cuối nếu có
-//     if (j > 0 && tenMon[j-1] == ' ') {
-//         j--;
-//     }
-    
-//     tenMon[j] = '\0';
-//     delete[] temp;
-// }
 
-// // Hàm chuẩn hóa mã môn học
-// void chuanHoaMaMonHoc(char* maMon) {
-//     if (maMon == NULL || strlen(maMon) == 0) return;
-    
-//     int len = strlen(maMon);
-//     char* temp = new char[len + 1];
-//     strcpy(temp, maMon);
-    
-//     // Bước 1: Xóa khoảng trắng đầu và cuối
-//     int start = 0, end = len - 1;
-//     while (start < len && (temp[start] == ' ' || temp[start] == '\t')) start++;
-//     while (end >= 0 && (temp[end] == ' ' || temp[end] == '\t')) end--;
-    
-//     if (start > end) {
-//         maMon[0] = '\0';
-//         delete[] temp;
-//         return;
-//     }
-    
-//     // Bước 2: Chuyển thành chữ in hoa và loại bỏ khoảng trắng giữa
-//     int j = 0;
-//     for (int i = start; i <= end; i++) {
-//         char c = temp[i];
-        
-//         // Nếu là chữ cái, số hoặc ký tự đặc biệt hợp lệ
-//         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || 
-//             (c >= '0' && c <= '9') || c == '-' || c == '_') {
-//             // Chuyển thành chữ in hoa nếu là chữ cái
-//             if (c >= 'a' && c <= 'z') {
-//                 maMon[j++] = toupper(c);
-//             } else {
-//                 maMon[j++] = c;
-//             }
-//         }
-//         // Bỏ qua khoảng trắng và các ký tự khác
-//     }
-    
-//     maMon[j] = '\0';
-//     delete[] temp;
-// }
 
 // Hàm chuẩn hóa nội dung câu hỏi thi
 void chuanHoaNoiDungCauHoi(char* noiDung) {
@@ -260,16 +148,5 @@ bool HopLeDapAn(char dapAn) {
     return (dapAn == 'A' || dapAn == 'B' || dapAn == 'C' || dapAn == 'D');
 }
 
-// Hàm chuẩn hóa và kiểm tra đáp án
-bool chuanHoaVaKiemTraDapAn(char& dapAn) {
-    // Chuẩn hóa trước
-    chuanHoaDapAn(dapAn);
-    
-    // Kiểm tra tính hợp lệ
-    if (!HopLeDapAn(dapAn)) {
-        return false; // Không hợp lệ
-    }
-    
-    return true; // Hợp lệ
-}
+
 #endif

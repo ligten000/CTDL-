@@ -24,7 +24,9 @@ struct MonHoc {
     char TENMH[50];
     nodeCauhoi * treeCauHoi = NULL;
     int insertsSinceRebuild = 0;
-     int maxID = 0; // Theo dõi NNN lớn nhất (000-999) để tối ưu sinh ID
+    int idPool[1000];
+    int remaining;
+    
 };
 
 // Môn học (Danh sách tuyến tính)

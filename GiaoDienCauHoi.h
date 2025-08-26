@@ -83,7 +83,7 @@ static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	}
 	char *id = sinhID(mh.MAMH, mh); // Dùng sinhID ngẫu nhiên thay vì tuần tự
 	if (id == NULL) { 
-		thongBaoLoi("Khong sinh duoc ID (het gioi han hoac trung)", 0, CH_MOUSE + 7); 
+		thongBaoLoi("Khong sinh duoc ID (het gioi han )", 0, CH_MOUSE + 7); 
 		return; 
 	}
 	CauHoi ch{};
@@ -176,6 +176,8 @@ static void xoaCauHoiUI(MonHoc &mh) {
 	gotoxy(0, CH_MOUSE + 3); cout << "Ban co chac muon xoa? (Y/N): ";
 	char c; while (true) { c=toupper(getch()); if (c=='N') return; if (c=='Y') break; }
 	if (!xoaNodeCauHoiKhoiCay(mh.treeCauHoi, id)) { thongBaoLoi("Xoa that bai", 0, CH_MOUSE + 4); return; }
+	// Hoàn trả ID về pool
+	returnIDtoPool(mh, string(id));
 	thongBaoLoi("Xoa thanh cong", 0, CH_MOUSE + 4);
 }
 

@@ -1,13 +1,14 @@
 MONHOC|CTDL|Cau truc du lieu
+CAUHOI|CTDL006|Loai cay tim kiem?|BST|AVL|Heap|Trie|A|0
+CAUHOI|CTDL003|Cau hoi ve hang doi?|List|Stack|Queue|Tree|C|0
 CAUHOI|CTDL001|Cau hoi ve cay?|La|Re|Than|Goc|A|0
 CAUHOI|CTDL002|Cau hoi ve ngan xep?|Stack|Queue|Tree|List|A|0
-CAUHOI|CTDL003|Cau hoi ve hang doi?|List|Stack|Queue|Tree|C|0
 CAUHOI|CTDL004|Ham push dung cho?|Stack|Queue|Array|File|A|0
 CAUHOI|CTDL005|Ham pop la gi?|Xoa|Them|Sua|Doc|A|0
-CAUHOI|CTDL006|Loai cay tim kiem?|BST|AVL|Heap|Trie|A|0
+CAUHOI|CTDL009|Con tro tro toi?|Dia chi|Gia tri|Bien|Cau truc|A|0
 CAUHOI|CTDL007|Kieu du lieu set?|Tap hop|Danh sach|Mang|Hang doi|A|0
 CAUHOI|CTDL008|Mang la gi?|Lien tuc|Khong lien tuc|Con tro|Da hinh|A|0
-CAUHOI|CTDL009|Con tro tro toi?|Dia chi|Gia tri|Bien|Cau truc|A|0
+CAUHOI|CTDL028|CAU HOI VE LOAI NGUA|NGUA VAN|NGUA O|NGUA MOT SUNG|CON LUA|A|0
 CAUHOI|CTDL010|CTDL nao dung cho DFS?|Stack|Queue|Heap|Tree|A|0
 CAUHOI|CTDL220|CU HOI VE CAY|A|B|C|D|A|0
 MONHOC|LTNC|Lap Trinh Nang Cao

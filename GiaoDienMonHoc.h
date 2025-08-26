@@ -107,7 +107,8 @@ static void themMonHocUI(ListMonHoc &dsMH) {
 	strcpy(dsMH.list[pos].TENMH, tenmh);
 	dsMH.list[pos].treeCauHoi = NULL;
 	dsMH.list[pos].insertsSinceRebuild = 0;
-	dsMH.list[pos].maxID = 0; // Khởi tạo maxID = 0 cho môn học mới
+	//dsMH.list[pos].maxID = 0; // Khởi tạo maxID = 0 cho môn học mới
+	initIDPool(dsMH.list[pos]); // Khởi tạo pool ID cho môn học mới
 	dsMH.n++;
 	thongBaoLoi("Them mon hoc thanh cong", 0, MH_MOUSE + 4);
 }
@@ -142,6 +143,8 @@ static void xoaMonHocUI(ListMonHoc &dsMH) {
 	gotoxy(0, MH_MOUSE + 3); cout << "Ban co chac chan muon xoa? (Y/N): ";
 	char ch;
 	while (true) { ch = toupper(getch()); if (ch == 'N') return; if (ch == 'Y') break; }
+	// Giai phong cay cau hoi cua mon truoc khi xoa khoi danh sach
+	freeTree(dsMH.list[idx].treeCauHoi);
 	for (int j = idx; j < dsMH.n - 1; ++j) dsMH.list[j] = dsMH.list[j+1];
 	dsMH.n--;
 	thongBaoLoi("Xoa thanh cong", 0, MH_MOUSE + 4);
@@ -206,7 +209,7 @@ static void suaMonHocUI(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 				}
 			}
 		}
-		// 3) Doi prefix ID cua tat ca cau hoi trong mon hoc khong dung vector: xay cay moi
+		
 		{
 			nodeCauhoi* oldRoot = dsMH.list[idx].treeCauHoi;
 			nodeCauhoi* newRoot = NULL;
@@ -227,7 +230,10 @@ static void suaMonHocUI(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 				ChenCauHoiTheoId(newRoot, ch, dsMH.list[idx]); // Truyền tham chiếu monHoc để cập nhật maxID
 				cur = cur->right;
 			}
+			// Giai phong cay cu truoc khi gan moi
+			freeTree(dsMH.list[idx].treeCauHoi);
 			dsMH.list[idx].treeCauHoi = newRoot;
+			rebuildIDPool(dsMH.list[idx]);
 		}
 		xapxepDanhSachMonHoc(dsMH);
 	}
@@ -297,7 +303,8 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 		} else {
 			switch (a) {
 				case 'A':
-					themMonHocUI(dsMH); xapxepDanhSachMonHoc(dsMH); numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
+					themMonHocUI(dsMH); //xapxepDanhSachMonHoc(dsMH); 
+					numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
 				case 'D':
 					xoaMonHocUI(dsMH); numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
 				case 'E':
