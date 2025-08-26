@@ -10,7 +10,7 @@
 #include "Cau_Hoi.h"
 
 using namespace std;
-
+inline void freeAllMonHoc(ListMonHoc &dsMH);
 // Ghi 1 môn học
 static inline void GhiMonHoc(ofstream &fo, const MonHoc &mh) {
 	fo << "MONHOC|" << mh.MAMH << "|" << mh.TENMH << '\n';
@@ -57,14 +57,11 @@ static void ChenCauHoiTheoId(nodeCauhoi* &root, const CauHoi &ch, MonHoc &mh) {
         int cmp = strcmp(ch.Id, root->data.Id);
         if (cmp < 0) ChenCauHoiTheoId(root->left, ch, mh);
         else if (cmp > 0) ChenCauHoiTheoId(root->right, ch, mh);
-        else return; // Trùng ID, bỏ qua
+        //else return; // Trùng ID, bỏ qua
         mh.insertsSinceRebuild++;
     }
     
-    // Cập nhật maxID từ ID mới
-    int num = atoi(ch.Id + strlen(mh.MAMH));
-    if (num > mh.maxID) mh.maxID = num;
-    
+   
     // Kiểm tra và rebuild (ngưỡng 100)
     int n = demNodeCauHoi(root);
     int h = chieuCao(root);
@@ -88,11 +85,11 @@ static void DocMonHoc(const string &line, ListMonHoc &dsMH) {
 	strncpy(mh.TENMH, tenmh.c_str(), sizeof(mh.TENMH)-1); mh.TENMH[sizeof(mh.TENMH)-1] = '\0';
 	mh.treeCauHoi = NULL;
 	mh.insertsSinceRebuild = 0;
-	mh.maxID = 0; // Khởi tạo maxID = 0
+	//mh.maxID = 0; // Khởi tạo maxID = 0
 }
 
 // Đọc dòng CAUHOI và chèn vào treeCauHoi của môn hiện tại
-static void DocCauHoi(const string &line, MonHoc &monHienTai, unordered_set<string> &idSet) {
+static void DocCauHoi(const string &line, MonHoc &monHienTai) {
 	// line: CAUHOI|ID|NOIDUNG|A|B|C|D|DAPAN|TRANGTHAI
 	// Không cần kiểm tra NULL vì đã là tham chiếu
 	stringstream ss(line);
@@ -107,20 +104,7 @@ static void DocCauHoi(const string &line, MonHoc &monHienTai, unordered_set<stri
 	getline(ss, dapAnStr, '|');
 	getline(ss, ttStr);
 	if (id.empty()) return;
-	// Đảm bảo ID duy nhất toàn hệ thống
-	if (idSet.find(id) != idSet.end()) return; // bỏ qua bản ghi trùng
-	idSet.insert(id);
 	
-	// Cập nhật maxID khi đọc từ file
-	const char* idStr = id.c_str();
-	int pos = 0; 
-	while (idStr[pos] && !isdigit(idStr[pos])) pos++;
-	if (idStr[pos]) {
-		int num = atoi(idStr + pos);
-		if (num > monHienTai.maxID) {
-			monHienTai.maxID = num;
-		}
-	}
 	
 	CauHoi ch{};
 	strncpy(ch.Id, id.c_str(), sizeof(ch.Id)-1); ch.Id[sizeof(ch.Id)-1] = '\0';
@@ -139,25 +123,36 @@ inline void DocFile(ListMonHoc &dsMH, const char* filename) {
     ifstream fi(filename);
     if (!fi.is_open()) return;
 	// Khởi tạo lại danh sách (không giải phóng bộ nhớ cũ ở đây)
-	dsMH.n = 0;
-	for (int i = 0; i < MAX_ListMH; ++i) {
-		// không bắt buộc xóa cây cũ ở đây
-	}
+	// dsMH.n = 0;
+	freeAllMonHoc(dsMH);
     string line;
 	MonHoc *monHienTai = NULL;
-	unordered_set<string> idSet; // theo dõi Id duy nhất
+	//unordered_set<string> idSet; // theo dõi Id duy nhất
 	while (getline(fi, line)) {
 		if (line.rfind("MONHOC|", 0) == 0) {
 			DocMonHoc(line, dsMH);
 			monHienTai = &dsMH.list[dsMH.n - 1];
 		} else if (line.rfind("CAUHOI|", 0) == 0) {
-			DocCauHoi(line, *monHienTai, idSet);
+			DocCauHoi(line, *monHienTai);
 		} else {
 			// dòng trống hoặc không hợp lệ -> bỏ qua
 		}
 	}
     fi.close();
+	 // Rebuild ID pool sau khi đọc file xong
+    for (int i = 0; i < dsMH.n; i++) {
+        rebuildIDPool(dsMH.list[i]);
+    }
+    
     cout<<"read file complete!"<<endl;
+}
+// Giải phóng toàn bộ cây câu hỏi của tất cả môn học và reset danh sách
+inline void freeAllMonHoc(ListMonHoc &dsMH) {
+    for (int i = 0; i < dsMH.n; i++) {
+        freeTree(dsMH.list[i].treeCauHoi);
+        dsMH.list[i].treeCauHoi = NULL;
+    }
+    dsMH.n = 0;
 }
 
 #endif // FILE_CAUHOI_H 

@@ -106,18 +106,18 @@ void chuanHoaMaMonHoc(char* maMon) {
     delete[] temp;
 }
 
-// Hàm tìm vị trí môn học theo MAMH
-int timViTriMonHoc(const ListMonHoc& dsMH, const char* maMon) {
-    if (maMon == NULL || dsMH.n == 0) return -1;
+// // Hàm tìm vị trí môn học theo MAMH
+// int timViTriMonHoc(const ListMonHoc& dsMH, const char* maMon) {
+//     if (maMon == NULL || dsMH.n == 0) return -1;
     
-    for (int i = 0; i < dsMH.n; i++) {
-        if (strcmp(dsMH.list[i].MAMH, maMon) == 0) {
-            return i; // Tìm thấy, trả về index
-        }
-    }
+//     for (int i = 0; i < dsMH.n; i++) {
+//         if (strcmp(dsMH.list[i].MAMH, maMon) == 0) {
+//             return i; // Tìm thấy, trả về index
+//         }
+//     }
     
-    return -1; // Không tìm thấy
-}
+//     return -1; // Không tìm thấy
+// }
 
 // Hàm kiểm tra tên môn học hợp lệ
 bool HopLeTenMon(const char* tenMon) {
@@ -170,152 +170,7 @@ bool TonTaiMAMH(const ListMonHoc& dsMH, const char* maMon) {
     return false; // Chưa tồn tại
 }
 
-// Hàm thêm môn học mới vào danh sách
-bool ThemMonHoc(ListMonHoc& dsMH, const char* maMon, const char* tenMon) {
-    // Kiểm tra đầu vào
-    if (maMon == NULL || tenMon == NULL) return false;
-    
-    // Kiểm tra danh sách đã đầy chưa
-    if (dsMH.n >= MAX_ListMH) {
-        cout << "Danh sach mon hoc da day! Khong the them mon moi.\n";
-        return false;
-    }
-    
-    // Tạo bản sao để chuẩn hóa
-    char maChuan[16], tenChuan[50];
-    strcpy(maChuan, maMon);
-    strcpy(tenChuan, tenMon);
-    
-    // Bước 1: Chuẩn hóa dữ liệu
-    chuanHoaMaMonHoc(maChuan);
-    chuanHoaTenMonHoc(tenChuan);
-    
-    // Bước 2: Kiểm tra tính hợp lệ
-    if (!HopLeMAMH(maChuan)) {
-        cout << "Ma mon hoc khong hop le! (3-5 ky tu A-Z)\n";
-        return false;
-    }
-    
-    if (!HopLeTenMon(tenChuan)) {
-        cout << "Ten mon hoc khong hop le! (khong duoc rong hoac toan khoang trang)\n";
-        return false;
-    }
-    
-    // Bước 3: Kiểm tra trùng lặp
-    if (TonTaiMAMH(dsMH, maChuan)) {
-        cout << "Ma mon hoc " << maChuan << " da ton tai!\n";
-        return false;
-    }
-    
-    // Bước 4: Thêm môn học mới vào danh sách
-    int viTri = dsMH.n;
-    strcpy(dsMH.list[viTri].MAMH, maChuan);
-    strcpy(dsMH.list[viTri].TENMH, tenChuan);
-    dsMH.list[viTri].treeCauHoi = NULL; // Khởi tạo cây câu hỏi rỗng
-    
-    dsMH.n++; // Tăng số lượng môn học
-    
-    cout << "Them mon hoc thanh cong!\n";
-    cout << "Ma mon: " << maChuan << endl;
-    cout << "Ten mon: " << tenChuan << endl;
-    
-    return true;
-}
 
-// Hàm sửa tên môn học theo mã
-bool SuaMonHoc(ListMonHoc& dsMH, const char* maMon, const char* tenMoi) {
-    // Kiểm tra đầu vào
-    if (maMon == NULL || tenMoi == NULL) return false;
-    
-    // Kiểm tra danh sách rỗng
-    if (dsMH.n == 0) {
-        cout << "Danh sach mon hoc rong! Khong co gi de sua.\n";
-        return false;
-    }
-    
-    // Bước 1: Tìm vị trí môn học cần sửa
-    int viTri = timViTriMonHoc(dsMH, maMon);
-    if (viTri == -1) {
-        cout << "Khong tim thay mon hoc co ma: " << maMon << endl;
-        return false;
-    }
-    
-    // Bước 2: Chuẩn hóa tên mới
-    char tenChuan[50];
-    strcpy(tenChuan, tenMoi);
-    chuanHoaTenMonHoc(tenChuan);
-    
-    // Bước 3: Kiểm tra tính hợp lệ của tên mới
-    if (!HopLeTenMon(tenChuan)) {
-        cout << "Ten mon hoc moi khong hop le! (khong duoc rong hoac toan khoang trang)\n";
-        return false;
-    }
-    
-    // Bước 4: Kiểm tra tên mới có khác tên cũ không
-    if (strcmp(dsMH.list[viTri].TENMH, tenChuan) == 0) {
-        cout << "Ten mon hoc moi giong ten cu! Khong can sua.\n";
-        return false;
-    }
-    
-    // Bước 5: Lưu tên cũ để thông báo
-    char tenCu[50];
-    strcpy(tenCu, dsMH.list[viTri].TENMH);
-    
-    // Bước 6: Cập nhật tên mới
-    strcpy(dsMH.list[viTri].TENMH, tenChuan);
-    
-    cout << "Sua mon hoc thanh cong!\n";
-    cout << "Ma mon: " << maMon << endl;
-    cout << "Ten cu: " << tenCu << endl;
-    cout << "Ten moi: " << tenChuan << endl;
-    
-    return true;
-}
 
-// Hàm xóa môn học theo mã
-bool XoaMonHoc(ListMonHoc& dsMH, const char* maMon) {
-    // Kiểm tra đầu vào
-    if (maMon == NULL) return false;
-    
-    // Kiểm tra danh sách rỗng
-    if (dsMH.n == 0) {
-        cout << "Danh sach mon hoc rong! Khong co gi de xoa.\n";
-        return false;
-    }
-    
-    // Bước 1: Tìm vị trí môn học cần xóa
-    int viTri = timViTriMonHoc(dsMH, maMon);
-    if (viTri == -1) {
-        cout << "Khong tim thay mon hoc co ma: " << maMon << endl;
-        return false;
-    }
-    
-    // Bước 2: Kiểm tra có thể xóa không (treeCauHoi == NULL)
-    if (dsMH.list[viTri].treeCauHoi != NULL) {
-        cout << "Khong the xoa mon hoc " << maMon << " vi da co cau hoi thi!\n";
-        cout << "Hay xoa tat ca cau hoi truoc khi xoa mon hoc.\n";
-        return false;
-    }
-    
-    // Bước 3: Lưu thông tin môn học để thông báo
-    char tenMon[50];
-    strcpy(tenMon, dsMH.list[viTri].TENMH);
-    
-    // Bước 4: Xóa môn học bằng cách dồn các phần tử phía sau lên
-    for (int i = viTri; i < dsMH.n - 1; i++) {
-        strcpy(dsMH.list[i].MAMH, dsMH.list[i + 1].MAMH);
-        strcpy(dsMH.list[i].TENMH, dsMH.list[i + 1].TENMH);
-        dsMH.list[i].treeCauHoi = dsMH.list[i + 1].treeCauHoi;
-    }
-    
-    // Bước 5: Giảm số lượng môn học
-    dsMH.n--;
-    
-    cout << "Xoa mon hoc thanh cong!\n";
-    cout << "Ma mon: " << maMon << endl;
-    cout << "Ten mon: " << tenMon << endl;
-    
-    return true;
-}
 
 #endif
