@@ -132,6 +132,9 @@ void xapXep(int X[],int n){
 }
 
 void layDeThi(Baithi*&bt, nodeCauhoi*&tree, int n){
+    if (bt->dsBaithichitiet != nullptr) {
+        delete[] bt->dsBaithichitiet;
+    }
     bt->dsBaithichitiet = new BaiThiChiTiets[n];
     bt->n = 0;
     int a = demCay(tree);
@@ -143,13 +146,14 @@ void layDeThi(Baithi*&bt, nodeCauhoi*&tree, int n){
 
     srand(time(0));
     int swap;
-    // Fisher–Yates: chọn n số đầu tiên đã được shuffle
+
     for (int wi = 0; wi < n; wi++) {
-        int r = wi + rand() % (a - wi);  // chọn từ [wi..a-1]
+        int r = wi + rand() % (a - wi);
         swap = X[wi]; 
         X[wi] = X[r]; 
         X[r] = swap; wi++;
     }
+
     xapXep(X, n);
     StackNode stack;
     nodeCauhoi* current = tree;

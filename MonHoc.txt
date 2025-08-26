@@ -10,8 +10,6 @@ CAUHOI|CTDL009|Con tro tro toi?|Dia chi|Gia tri|Bien|Cau truc|A|1
 CAUHOI|CTDL008|Mang la gi?|Lien tuc|Khong lien tuc|Con tro|Da hinh|A|1
 CAUHOI|CTDL010|CTDL nao dung cho DFS?|Stack|Queue|Heap|Tree|A|1
 CAUHOI|CTDL220|CU HOI VE CAY|A|B|C|D|A|0
-MONHOC|LTNC|Lap Trinh Nang Cao
-CAUHOI|LTNC011|Ham de quy la gi?|Ham goi chinh no|Ham co nhieu tham so|Ham chi thuc thi 1 lan|Ham khong tra ve gi|A|1
 MONHOC|CSDL|Co so du lieu
 CAUHOI|CSDL007|Lenh UPDATE dung de?|Cap nhat du lieu|Them bang moi|Xoa bang|Tao khoa|A|0
 CAUHOI|CSDL003|Khoa chinh la gi?|Truong duy nhat xac dinh ban ghi|Truong khong trung lap|Truong co gia tri duy nhat|Tat ca|A|0
@@ -30,24 +28,6 @@ CAUHOI|CSDL013|Trigger la gi?|Thu tuc tu dong thuc thi|Ham SQL|Bang ao|Chi muc|A
 CAUHOI|CSDL016|Lenh DROP dung de?|Xoa bang hoac CSDL|Xoa ban ghi|Xoa cot|Xoa khoa|A|0
 CAUHOI|CSDL015|ERD viet tat cho?|Entity Relationship Diagram|Entity Record Data|Entity Random Diagram|Entity Relation Data|A|0
 CAUHOI|CSDL017|Transaction dung de?|Dam bao tinh toan ven|Tang toc truy van|Tang toc chen|Tang toc xoa|A|0
-MONHOC|MANGMT|Mang may tinh
-CAUHOI|MANGMT007|Dia chi IP v6 co bao nhieu bit?|128|32|64|256|A|0
-CAUHOI|MANGMT003|IP viet tat cho?|Internet Protocol|Internal Protocol|Information Protocol|Interface Protocol|A|0
-CAUHOI|MANGMT001|TCP viet tat cho?|Transmission Control Protocol|Transfer Control Protocol|Transport Communication Protocol|Tele Communication Protocol|A|0
-CAUHOI|MANGMT002|UDP viet tat cho?|User Datagram Protocol|Universal Data Protocol|Unified Datagram Protocol|User Data Program|A|0
-CAUHOI|MANGMT005|Tang ung dung cua OSI la?|Tang 7|Tang 6|Tang 5|Tang 4|A|0
-CAUHOI|MANGMT004|Mo hinh OSI co may tang?|7|5|4|3|A|0
-CAUHOI|MANGMT006|Dia chi IP v4 co bao nhieu bit?|32|64|128|16|A|0
-CAUHOI|MANGMT011|SMTP dung cho?|Gui mail|Nhan mail|Duyet web|Chia se file|A|0
-CAUHOI|MANGMT009|Port mac dinh cua HTTPS?|443|22|53|110|A|0
-CAUHOI|MANGMT008|Port mac dinh cua HTTP?|80|21|25|110|A|0
-CAUHOI|MANGMT010|DNS dung de?|Phan giai ten mien|Ma hoa du lieu|Tang toc mang|Luu tru du lieu|A|0
-CAUHOI|MANGMT014|Router dung de?|Dinh tuyen goi tin|Phat song wifi|Tang toc mang|Luu tru du lieu|A|0
-CAUHOI|MANGMT012|FTP dung cho?|Truyen file|Gui mail|Nhan mail|Ma hoa|A|0
-CAUHOI|MANGMT013|Ping dung de?|Kiem tra ket noi|Tang toc mang|Ma hoa du lieu|Kiem tra may in|A|0
-CAUHOI|MANGMT016|Tang vat ly truyen?|Bit|Goi tin|Khung|Thong diep|A|0
-CAUHOI|MANGMT015|Switch dung de?|Chuyen mach|Tang toc|Ma hoa|Luu tru|A|0
-CAUHOI|MANGMT017|VPN viet tat cho?|Virtual Private Network|Virtual Protocol Network|Variable Private Network|Virtual Public Network|A|0
 MONHOC|HDH|He dieu hanh
 CAUHOI|HDH007|File system dung de?|Quan ly tap tin|Quan ly tien trinh|Quan ly bo nho|Quan ly CPU|A|0
 CAUHOI|HDH003|Chuc nang cua HDH?|Quan ly tai nguyen|Cho phep nguoi dung thao tac|Quan ly tien trinh|Tat ca|D|0
@@ -66,3 +46,21 @@ CAUHOI|HDH013|Cache dung de?|Tang toc truy cap|Luu tru du lieu|Quan ly tap tin|M
 CAUHOI|HDH016|Multitasking la?|Da nhiem|Don nhiem|Khong nhiem|Luong nho|A|0
 CAUHOI|HDH015|Shell la?|Giao dien dong lenh|Phan cung|Phan mem ung dung|Tap tin|A|0
 CAUHOI|HDH017|Interrupt la?|Ngat|Tiep tuc|Dung|Restart|A|0
+MONHOC|MANGMT|Mang may tinh
+CAUHOI|MANGMT007|Dia chi IP v6 co bao nhieu bit?|128|32|64|256|A|0
+CAUHOI|MANGMT003|IP viet tat cho?|Internet Protocol|Internal Protocol|Information Protocol|Interface Protocol|A|0
+CAUHOI|MANGMT001|TCP viet tat cho?|Transmission Control Protocol|Transfer Control Protocol|Transport Communication Protocol|Tele Communication Protocol|A|0
+CAUHOI|MANGMT002|UDP viet tat cho?|User Datagram Protocol|Universal Data Protocol|Unified Datagram Protocol|User Data Program|A|0
+CAUHOI|MANGMT005|Tang ung dung cua OSI la?|Tang 7|Tang 6|Tang 5|Tang 4|A|0
+CAUHOI|MANGMT004|Mo hinh OSI co may tang?|7|5|4|3|A|0
+CAUHOI|MANGMT006|Dia chi IP v4 co bao nhieu bit?|32|64|128|16|A|0
+CAUHOI|MANGMT011|SMTP dung cho?|Gui mail|Nhan mail|Duyet web|Chia se file|A|0
+CAUHOI|MANGMT009|Port mac dinh cua HTTPS?|443|22|53|110|A|0
+CAUHOI|MANGMT008|Port mac dinh cua HTTP?|80|21|25|110|A|0
+CAUHOI|MANGMT010|DNS dung de?|Phan giai ten mien|Ma hoa du lieu|Tang toc mang|Luu tru du lieu|A|0
+CAUHOI|MANGMT014|Router dung de?|Dinh tuyen goi tin|Phat song wifi|Tang toc mang|Luu tru du lieu|A|0
+CAUHOI|MANGMT012|FTP dung cho?|Truyen file|Gui mail|Nhan mail|Ma hoa|A|0
+CAUHOI|MANGMT013|Ping dung de?|Kiem tra ket noi|Tang toc mang|Ma hoa du lieu|Kiem tra may in|A|0
+CAUHOI|MANGMT016|Tang vat ly truyen?|Bit|Goi tin|Khung|Thong diep|A|0
+CAUHOI|MANGMT015|Switch dung de?|Chuyen mach|Tang toc|Ma hoa|Luu tru|A|0
+CAUHOI|MANGMT017|VPN viet tat cho?|Virtual Private Network|Virtual Protocol Network|Variable Private Network|Virtual Public Network|A|0

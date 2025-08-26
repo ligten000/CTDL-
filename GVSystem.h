@@ -80,21 +80,21 @@ void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
         
 
         bool trung = false;
-            for (i = 0; i < dsLop.n; ++i) {
-                int cmp = strcmp(dsLop.lop[i]->MALOP, malop);
-                if (cmp == 0) {
-                    trung = true;
-                    break;
-                }
-                if (cmp > 0) break;
+        for (i = 0; i < dsLop.n; ++i) {
+            int cmp = strcmp(dsLop.lop[i]->MALOP, malop);
+            if (cmp == 0) {
+                trung = true;
+                break;
             }
+            if (cmp > 0) break;
+        }
 
-            if (trung) {
-                clearLine(15,mouse,15);
-                thongBaoLoi("Ma lop da ton tai", 15,mouse);
-            } else {
-                break; 
-            }   
+        if (trung) {
+            clearLine(15,mouse,15);
+            thongBaoLoi("Ma lop da ton tai", 15,mouse);
+        } else {
+            break; 
+        }   
     }
     
     // Kiểm tra trùng mã lớp

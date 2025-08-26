@@ -96,7 +96,7 @@ static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	ch.DapAn = dapAn;
 	ch.trangthai = 0;
 	ChenCauHoiTheoId(mh.treeCauHoi, ch, mh); // Truyền tham chiếu mh để cập nhật maxID
-	mh.insertsSinceRebuild++;
+	//mh.insertsSinceRebuild++;
 	int nNodes = demNodeCauHoi(mh.treeCauHoi);
 	int h = chieuCao(mh.treeCauHoi);
 	// Tăng ngưỡng lên 100 và kiểm tra chiều cao để ngăn cây suy biến

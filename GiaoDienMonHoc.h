@@ -143,6 +143,7 @@ static void xoaMonHocUI(ListMonHoc &dsMH) {
 	char ch;
 	while (true) { ch = toupper(getch()); if (ch == 'N') return; if (ch == 'Y') break; }
 	for (int j = idx; j < dsMH.n - 1; ++j) dsMH.list[j] = dsMH.list[j+1];
+	freeTree(dsMH.list[idx].treeCauHoi);
 	dsMH.n--;
 	thongBaoLoi("Xoa thanh cong", 0, MH_MOUSE + 4);
 }
@@ -228,6 +229,7 @@ static void suaMonHocUI(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 				cur = cur->right;
 			}
 			dsMH.list[idx].treeCauHoi = newRoot;
+			freeTree(oldRoot);
 		}
 		xapxepDanhSachMonHoc(dsMH);
 	}
@@ -297,7 +299,8 @@ inline bool hienthidanhsachMonHoc(ListMonHoc &dsMH, DanhSachLop &dsLop) {
 		} else {
 			switch (a) {
 				case 'A':
-					themMonHocUI(dsMH); xapxepDanhSachMonHoc(dsMH); numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
+					themMonHocUI(dsMH); //xapxepDanhSachMonHoc(dsMH); 
+					numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
 				case 'D':
 					xoaMonHocUI(dsMH); numPage = (dsMH.n + MH_PAGE_SIZE - 1) / MH_PAGE_SIZE; break;
 				case 'E':
