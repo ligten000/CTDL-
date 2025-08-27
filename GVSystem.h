@@ -56,6 +56,17 @@ void xapxepDanhSachLop(DanhSachLop & dsLop){
     }
 }
 
+int timLop(DanhSachLop& ds, char* malop){
+    for (int i = 0; i < ds.n; ++i) {
+        int cmp = strcmp(ds.lop[i]->MALOP, malop);
+        if (cmp == 0) {
+            return i;
+        }
+        if (cmp > 0) break;
+    }
+    return -1;
+}
+
 void themLop(DanhSachLop &dsLop, Lop *& lop, char malop[], char tenlop[]){
     if (dsLop.n >= Max_lop) {
         cout << "\nKhong the them lop moi. Danh sach lop da day!\n";
@@ -152,19 +163,9 @@ void xoaLop(DanhSachLop&dsLop){
             thongBaoLoi("Ma lop khong duoc rong!", 15,mouse);
             continue;
         }
-        bool tontai = false;
-        for (i = 0; i < dsLop.n; ++i) {
-            int cmp = strcmp(dsLop.lop[i]->MALOP, malop);
-            if (cmp == 0) {
-                tontai = true;
-                break;
-            }
-            if (cmp > 0) {
-                break;
-            }
-        }
+        i = timLop(dsLop, malop);
 
-        if (tontai == false) {
+        if (i < 0) {
             clearLine(15,mouse,15);
             thongBaoLoi("Ma lop khong ton tai!",15,mouse);
         } else {
@@ -211,18 +212,6 @@ void xoaLop(DanhSachLop&dsLop){
                 continue;  
         } 
     } 
-}
-
-int timLop(DanhSachLop& ds, char* malop){
-    int i;
-    for (i = 0; i < ds.n; ++i) {
-        int cmp = strcmp(ds.lop[i]->MALOP, malop);
-        if (cmp == 0) {
-            return i;
-        }
-        if (cmp > 0) break;
-    }
-    return -1;
 }
 
 void suaLop(DanhSachLop& ds, int start, int end) {
@@ -275,44 +264,48 @@ void suaLop(DanhSachLop& ds, int start, int end) {
         }
 
         ch = toupper(getch());
+        if (ch == -32 || ch == 0) { // phím đặc biệt
+            ch = getch();
+            if (ch == 72 && currentRow > mouse +1) currentRow--;
+            else if (ch == 80 && currentRow < mouse +2) currentRow++;
+        }
+        else{
+            if(ch == 13){
+                saved = false;
+                if (currentRow == mouse +1) {
+                    clearLine(15, mouse +1, 15);
+                    gotoxy(15, mouse +1);
+                    NhapMa(malop, 15);
 
-        switch (ch) {
-        case 13: // ENTER để chỉnh sửa dòng hiện tại
-            saved = false;
-            if (currentRow == mouse +1) {
-                clearLine(15, mouse +1, 15);
-                gotoxy(15, mouse +1);
-                NhapMa(malop, 15);
-
-                if (strlen(malop) == 0) {
-                    strcpy(malop, ds.lop[i]->MALOP); // giữ nguyên nếu bỏ trống
-                } else if (strcmp(malop, ds.lop[i]->MALOP) != 0) {
-                    // Kiểm tra trùng mã
-                    bool trung = false;
-                    for (int j = 0; j < ds.n; j++) {
-                        if (j == i) continue;
-                        if (strcmp(ds.lop[j]->MALOP, malop) == 0) {
-                            trung = true;
-                            break;
+                    if (strlen(malop) == 0) {
+                        strcpy(malop, ds.lop[i]->MALOP); // giữ nguyên nếu bỏ trống
+                    } else if (strcmp(malop, ds.lop[i]->MALOP) != 0) {
+                        // Kiểm tra trùng mã
+                        bool trung = false;
+                        for (int j = 0; j < ds.n; j++) {
+                            if (j == i) continue;
+                            if (strcmp(ds.lop[j]->MALOP, malop) == 0) {
+                                trung = true;
+                                break;
+                            }
+                        }
+                        if (trung) {
+                            thongBaoLoi("Ma lop da ton tai", 15, mouse +1);
+                            strcpy(malop, ds.lop[i]->MALOP);
                         }
                     }
-                    if (trung) {
-                        thongBaoLoi("Ma lop da ton tai", 15, mouse +1);
-                        strcpy(malop, ds.lop[i]->MALOP);
-                    }
+                } else if (currentRow == mouse +2) {
+                    clearLine(15, mouse +2, 50);
+                    gotoxy(15, mouse +2);
+                    NhapChuoi(tenlop, 50);
+                    chuanHoaKhoangCach(tenlop);
+                    if (strlen(tenlop) == 0)
+                        strcpy(tenlop, ds.lop[i]->TENLOP);
                 }
-            } else if (currentRow == mouse +2) {
-                clearLine(15, mouse +2, 50);
-                gotoxy(15, mouse +2);
-                NhapChuoi(tenlop, 50);
-                chuanHoaKhoangCach(tenlop);
-                if (strlen(tenlop) == 0)
-                    strcpy(tenlop, ds.lop[i]->TENLOP);
+                continue;
             }
-            break;
-
-        case 'S': // Lưu thay đổi
-            if(saved == false){
+            if(ch == 'S'){
+                if(saved == false){
                 gotoxy(0,mouse +3);
                 cout << "Ban co chac muon luu thay doi khong? (Y/N): ";
                 while (true) {
@@ -337,17 +330,11 @@ void suaLop(DanhSachLop& ds, int start, int end) {
                     }
                 }
             }
-            break;
-
-        case 72: // Mũi tên lên
-            if (currentRow > mouse +1) currentRow--;
-            break;
-        case 80: // Mũi tên xuống
-            if (currentRow < mouse +2) currentRow++;
-            break;
-
-        case 27: // ESC - Thoát nếu chưa lưu
-            if (saved) return;
+            continue;
+            }
+        }
+        if(ch == 27){
+             if (saved) return;
             gotoxy(0,mouse +3);
             cout << "Chua luu thay doi, co chac muon thoat khong (Y/N): ";
             while (true) {
@@ -358,10 +345,7 @@ void suaLop(DanhSachLop& ds, int start, int end) {
                     break;
                 }
             }
-            break;
-
-        default:
-            break;
+            continue;
         }
     }
 }

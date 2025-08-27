@@ -83,7 +83,7 @@ static void themCauHoiUI(ListMonHoc &dsMH, MonHoc &mh) {
 	}
 	char *id = sinhID(mh.MAMH, mh); // Dùng sinhID ngẫu nhiên thay vì tuần tự
 	if (id == NULL) { 
-		thongBaoLoi("Khong sinh duoc ID (het gioi han hoac trung)", 0, CH_MOUSE + 7); 
+		thongBaoLoi("Khong sinh duoc ID (het gioi han)", 0, CH_MOUSE + 7); 
 		return; 
 	}
 	CauHoi ch{};
